@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="9" height="9" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="16" tileheight="16" spacing="4" tilecount="1767" columns="57">
+  <image source="../Spritesheet/roguelikeSheet_transparent.png" width="1136" height="616"/>
+ </tileset>
+ <layer name="Floor" width="9" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,120,120,120,120,120,120,120,0,
+0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="Carpet" width="9" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,
+0,0,0,1379,1380,1381,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,923,924,924,924,925,0,0,
+0,0,980,981,981,981,982,0,0,
+0,0,1037,1038,1038,1038,1039,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,1094,1095,1096,0,0,0,
+0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="Barriers" width="9" height="9">
+  <data encoding="csv">
+701,699,699,0,0,0,699,699,702,
+757,0,0,0,0,0,0,0,757,
+757,0,0,0,0,0,0,0,757,
+757,0,0,191,191,191,0,0,757,
+757,0,0,198,199,313,0,0,757,
+757,0,0,192,192,192,0,0,757,
+757,0,0,0,0,0,0,0,757,
+757,0,0,0,0,0,0,0,757,
+758,699,699,0,0,0,699,699,759
+</data>
+ </layer>
+</map>

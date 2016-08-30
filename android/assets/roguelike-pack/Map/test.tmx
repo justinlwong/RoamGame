@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="13" height="13" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="16" tileheight="16" spacing="2" tilecount="2142" columns="63">
+  <image source="../Spritesheet/roguelikeSheet_transparent.png" width="1136" height="616"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="13" height="13">
+  <data encoding="csv">
+1,1,0,0,0,0,0,0,0,0,0,0,0,
+2,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,127,128,129,130,131,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,127,128,129,130,131,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,127,128,129,130,131,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,127,127,128,129,130,131,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

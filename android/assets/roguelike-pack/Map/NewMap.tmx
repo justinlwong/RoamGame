@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" name="roguelikeSheet_transparent" tilewidth="16" tileheight="16" spacing="1" tilecount="1767" columns="57">
+  <image source="../Spritesheet/roguelikeSheet_transparent.png" width="968" height="526"/>
+ </tileset>
+ <layer name="Ground Terrain" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwwEJAAAMBKFr9v1bLcdAwVVTVVVVVVVVVVXV5w8B8Gdb
+  </data>
+ </layer>
+ <layer name="Roads" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20ON6AAAAAAAAAAAADg3wAnEAAB
+  </data>
+ </layer>
+</map>
