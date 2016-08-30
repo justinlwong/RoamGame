@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">RoamGame</string>
+    <string name="title_activity_menu">MenuActivity</string>
 
+    <string name="GAD7_Q0">Over the last 2 weeks, how often have you been bothered by the following problems?</string>
+    <string name="GAD7_QO">Not at all = 0, Several days = 1, More than half the days = 2, Nearly every day = 3</string>
+
+    <string name="GAD7_Q1">Feeling nervous, anxious, or on edge</string>
+    <string name="GAD7_Q2">Not being able to stop or control worrying</string>
+    <string name="GAD7_Q3">Worrying too much about different things</string>
+    <string name="GAD7_Q4">Trouble relaxing</string>
+    <string name="GAD7_Q5">Being so restless that it is hard to sit still</string>
+    <string name="GAD7_Q6">Becoming easily annoyed or irritable</string>
+    <string name="GAD7_Q7">Feeling afraid as if something awful might happen</string>
+    <string name="GAD7_QB">If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?</string>
+
+
+    <string name="IUS_Q0"> For each question below, please select a number (1 to 5) that describes you best.</string>
+    <string name="IUS_QO">Not at all characteristic of me = 1, Somewhat characteristic of me = 3, Entirely characteristic of me = 5</string>
+    <string name="IUS_Q1">Uncertainty stops me from having a firm opinion</string>
+    <string name="IUS_Q2">Being uncertain means that a person is disorganized</string>
+    <string name="IUS_Q3">Uncertainty makes life intolerable</string>
+    <string name="IUS_Q4">It\'s unfair not having any guarantees in life</string>
+    <string name="IUS_Q5">My mind can\'t be relaxed if I don\'t know what will happen tomorrow</string>
+    <string name="IUS_Q6">Uncertainty makes me uneasy, anxious or stressed</string>
+    <string name="IUS_Q7">Unforeseen events upset me greatly</string>
+    <string name="IUS_Q8">It frustrates me not having all the information I need</string>
+    <string name="IUS_Q9">Uncertainty keeps me from living as full life</string>
+    <string name="IUS_Q10">One should always look ahead so as to avoid surprises</string>
+    <string name="IUS_Q11">A small unforeseen event can spoil everything, even with the best of planning</string>
+    <string name="IUS_Q12">When it\'s time to act, uncertainty paralyzes me</string>
+    <string name="IUS_Q13">Being uncertain means that I am not first rate</string>
+    <string name="IUS_Q14">When I am uncertain, I can\'t go forward</string>
+    <string name="IUS_Q15">When I am uncertain I can\'t function very well</string>
+    <string name="IUS_Q16">Unlike me, others always seem to know where they are going</string>
+    <string name="IUS_Q17">Uncertainty makes me vulnerable, unhappy or sad</string>
+    <string name="IUS_Q18">I always want to know what the future has in store for me</string>
+    <string name="IUS_Q19">I can\'t stand being taken by surprise</string>
+    <string name="IUS_Q20">The smallest doubt can stop me from acting</string>
+    <string name="IUS_Q21">I should be able to organize everything in advance</string>
+    <string name="IUS_Q22">Being uncertain means that I lack confidence</string>
+    <string name="IUS_Q23">I think it\'s unfair that other people seem sure about their future</string>
+    <string name="IUS_Q24">Uncertainty keeps me from sleeping soundly</string>
+    <string name="IUS_Q25">I must get away from all uncertain situations</string>
+    <string name="IUS_Q26">The ambiguities in life stress me</string>
+    <string name="IUS_Q27">I can\'t stand being undecided about my future</string>
+
+    <string name="UI_name">Please enter a user name:</string>
+    <string name="UI_fname">Please enter your first name:</string>
+    <string name="UI_lname">Please enter your last name:</string>
+    <string name="UI_age">Please enter your age:</string>
+    <string name="UI_gender">Please enter your gender:</string>
 </resources>
