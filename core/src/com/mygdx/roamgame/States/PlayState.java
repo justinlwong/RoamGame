@@ -252,6 +252,7 @@ public class PlayState extends State {
 
         // dialog setup
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
@@ -345,11 +346,19 @@ public class PlayState extends State {
             }
         };
 
+        barrelChooseDialog.setSkin(skin);
+
+
+
         barrelChooseDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
         barrelChooseDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 4);
 
         barrelChooseDialog.button("Points", 1L);
         barrelChooseDialog.button("Health", 2L);
+
+
+
+
 
     }
 
