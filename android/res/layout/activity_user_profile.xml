@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.mygdx.roamgame.UserProfileActivity">
+
+    <TextView
+        android:id="@+id/uNameText"
+        android:text="@string/UI_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/blue"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/et_uname"
+        android:inputType="textCapWords"
+        android:maxLength="15"
+        android:layout_below="@id/uNameText"
+        android:textColor="@color/white"
+        android:background="@color/gray"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/fNameText"
+        android:text="@string/UI_fname"
+        android:textColor="@color/blue"
+        android:layout_below="@id/et_uname"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/et_fname"
+        android:maxLength="15"
+        android:inputType="textCapWords"
+        android:layout_below="@id/fNameText"
+        android:textColor="@color/white"
+        android:background="@color/gray"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/lNameText"
+        android:text="@string/UI_lname"
+        android:layout_below="@+id/et_fname"
+        android:textColor="@color/blue"
+        android:layout_marginTop="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/et_lname"
+        android:inputType="textCapWords"
+        android:maxLength="15"
+        android:layout_below="@id/lNameText"
+        android:textColor="@color/white"
+        android:background="@color/gray"/>
+
+    <TextView
+        android:id="@+id/genderText"
+        android:text="@string/UI_gender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/blue"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/et_lname"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/et_gender"
+        android:inputType="textCapWords"
+        android:maxLength="15"
+        android:layout_below="@id/genderText"
+        android:textColor="@color/white"
+        android:background="@color/gray"/>
+
+    <TextView
+        android:id="@+id/ageText"
+        android:text="@string/UI_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/blue"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/et_gender"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/et_age"
+        android:inputType="number"
+        android:maxLength="15"
+        android:layout_below="@id/ageText"
+        android:textColor="@color/white"
+        android:background="@color/gray"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:id="@+id/button_submit"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

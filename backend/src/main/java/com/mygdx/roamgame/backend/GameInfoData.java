@@ -13,7 +13,14 @@ public class GameInfoData {
     Long id;
     String user;
     Long score;
+    Long gameDuration;
+    int inputFrequency;
 
-    public GameInfoData() {}
+    public GameInfoData(String u, Long s, Long gd, int inputf) {
+        user = u;
+        score = s;
+        gameDuration = gd;
+        inputFrequency = inputf;
+    }
 
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.roamgame.States.GameStateManager;
 import com.mygdx.roamgame.States.MenuState;
+import com.mygdx.roamgame.backend.myApi.MyApi;
 
 public class RoamGame extends ApplicationAdapter {
 
@@ -18,6 +19,13 @@ public class RoamGame extends ApplicationAdapter {
 	private GameStateManager gsm;
 	private SpriteBatch batch;
 	private SpriteBatch hudBatch;
+
+	private static MyApi apiService;
+
+	public void setApi(MyApi service)
+	{
+		apiService = service;
+	}
 
 
 	Texture img;

@@ -147,6 +147,9 @@ public class PlayState extends State {
     Skin skin;
     Stage stage;
 
+    // File
+    FileHandle handle;
+
     public class PoisonObject
     {
         public Rectangle rect;
@@ -187,6 +190,10 @@ public class PlayState extends State {
     protected PlayState(final GameStateManager gsm) {
         super(gsm);
 
+        // file
+        System.out.println(Gdx.files.getLocalStoragePath());
+        handle = Gdx.files.local("gameInfoLog.txt");
+        //handle.writeString("Hello!", false);
         // environments
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 4, 8, 2);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
@@ -274,6 +281,7 @@ public class PlayState extends State {
                     prefs.putInteger("factor1", (int)currentFactor1);
                     prefs.putInteger("factor2", (int)currentFactor2);
                     prefs.flush();
+                    handle.writeString(score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), false);
                     gsm.set(new ScoreScreenState(gsm));
                 }
             }
@@ -701,6 +709,8 @@ public class PlayState extends State {
             prefs.putInteger("factor1", (int)currentFactor1);
             prefs.putInteger("factor2", (int)currentFactor2);
             prefs.flush();
+
+            handle.writeString(score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), false);
             gsm.set(new ScoreScreenState(gsm));
         }
     }
