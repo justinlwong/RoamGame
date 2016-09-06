@@ -60,14 +60,14 @@ public class MenuActivity extends Activity {
             }
         });
 
-        Button iusButton = (Button)findViewById(R.id.button_ius);
-        iusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent userProfileIntent = new Intent(context, IUSurveyActivity.class);
-                startActivity(userProfileIntent);
-            }
-        });
+//        Button iusButton = (Button)findViewById(R.id.button_ius);
+//        iusButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent userProfileIntent = new Intent(context, IUSurveyActivity.class);
+//                startActivity(userProfileIntent);
+//            }
+//        });
 
         /*Button gad7Button = (Button)findViewById(R.id.button_gad7);
         gad7Button.setOnClickListener(new View.OnClickListener() {
@@ -78,14 +78,14 @@ public class MenuActivity extends Activity {
             }
         });*/
 
-        Button userGButton = (Button)findViewById(R.id.userGuideButton);
-        userGButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent userProfileIntent = new Intent(context, user_guide.class);
-                startActivity(userProfileIntent);
-            }
-        });
+//        Button userGButton = (Button)findViewById(R.id.userGuideButton);
+//        userGButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent userProfileIntent = new Intent(context, user_guide.class);
+//                startActivity(userProfileIntent);
+//            }
+//        });
 
         MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), null)

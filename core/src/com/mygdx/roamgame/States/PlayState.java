@@ -75,6 +75,8 @@ public class PlayState extends State {
     private float maxDistanceSubMaze;
     private boolean isTouched = false;
     private int levelScore = 1;
+    private long levelStartTime;
+    private long levelDuration;
 
     // stats info
     private float realTimeFactor1;
@@ -193,7 +195,7 @@ public class PlayState extends State {
         // file
         System.out.println(Gdx.files.getLocalStoragePath());
         handle = Gdx.files.local("gameInfoLog.txt");
-        //handle.writeString("Hello!", false);
+        //handle.writeString("Hello!", true);
         // environments
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 4, 8, 2);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
@@ -282,7 +284,7 @@ public class PlayState extends State {
                     prefs.putInteger("factor1", (int)currentFactor1);
                     prefs.putInteger("factor2", (int)currentFactor2);
                     prefs.flush();
-                    handle.writeString(score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), false);
+                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), true);
                     gsm.set(new ScoreScreenState(gsm));
                 }
             }
@@ -317,6 +319,9 @@ public class PlayState extends State {
 
                 int selected = Integer.parseInt(object.toString());
 
+                // log event
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 1 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " " + String.valueOf(selected) + " 0 0 0\n", true);
+
                 if (selected == 1)
                 {
                     healthBarVal -= 0.05f * maxHealthLosable;
@@ -341,6 +346,8 @@ public class PlayState extends State {
                     // Play sound
                     pickupItemSound.play(0.5f);
                 }
+
+
 
 
             }
@@ -554,6 +561,10 @@ public class PlayState extends State {
                 healthBarVal+=5;
                 player.slowPlayer();
                 lastPoisonedTime = TimeUtils.millis();
+
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 2 0 0\n", true);
+
+
             }
 
             if(TimeUtils.millis() - redPoisonArr.get(index).timer > 6*SEC) {
@@ -640,6 +651,10 @@ public class PlayState extends State {
                     healthBarVal+=20;
                     zombie.playSound();
                     lastHitTime = TimeUtils.millis();
+
+                    // log event
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0\n", true);
+
                 }
             }
 
@@ -719,7 +734,7 @@ public class PlayState extends State {
             prefs.putInteger("factor2", (int)currentFactor2);
             prefs.flush();
 
-            handle.writeString(score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), false);
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
             gsm.set(new ScoreScreenState(gsm));
         }
     }
@@ -765,6 +780,9 @@ public class PlayState extends State {
                 location = 1;
                 transitionFrame = true;
 
+                levelStartTime = TimeUtils.millis();
+                levelDuration = 0;
+
                 levelAnimationStart = TimeUtils.millis();
                 levelAnimation = true;
 
@@ -782,6 +800,12 @@ public class PlayState extends State {
             if (subMaze.getExitRectangle().overlaps(player.getBounds())) {
                 location = 0;
                 transitionFrame = true;
+
+                levelDuration = TimeUtils.millis() - levelStartTime;
+
+                // log info
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 3 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + "\n", true);
+
                 // level up
                 levelCounter += 1;
 
@@ -808,6 +832,8 @@ public class PlayState extends State {
                 zombies = new Array<Zombie>();
 
                 spawnInitialBarrels();
+
+
 
                 Timer.schedule(new Timer.Task() {
 

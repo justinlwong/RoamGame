@@ -50,7 +50,7 @@ public class Player {
     private boolean isSlowed;
     private boolean isBoosted;
 
-    static float speedmax = 180f;
+    static float speedmax = 360f;
 
     static float slowDamping = 0.98f;
 

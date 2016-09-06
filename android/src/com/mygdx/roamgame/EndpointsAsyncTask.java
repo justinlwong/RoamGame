@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     private static MyApi myApiService = null;
@@ -77,29 +78,58 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
             BufferedReader br = new BufferedReader(new FileReader(filepath));
             File file = new File(filepath);
             String log = br.readLine();
-            if (log != null) {
+            String userName = MenuActivity.userDB.getUserName();
+            if (userName == null)
+                userName = "JohnDoe";
+            Random rand = new Random();
+            int gameID = rand.nextInt(99999) + 1;
+            while (log != null) {
                 String[] entries = log.split(" ");
-                //System.out.println(String.valueOf(entries.length));
-                if (entries != null && entries.length == 3) {
-                    long score = Long.parseLong(entries[0]);
-                    long gameDuration = Long.parseLong(entries[1]);
-                    int inputFrequency = Integer.parseInt(entries[2]);
-                    System.out.println("Score: " + String.valueOf(score));
+                System.out.println(String.valueOf(entries.length));
+                if (entries != null && entries.length > 1) {
 
-                    //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
-                    myApiService.uploadGameData("Josh Donaldson", (int)score, (int)gameDuration, inputFrequency).execute();
+                    if (entries[0].compareTo("game") == 0) {
+                        long score = Long.parseLong(entries[1]);
+                        long gameDuration = Long.parseLong(entries[2])/1000;
+                        int inputFrequency = Integer.parseInt(entries[3]);
+                        System.out.println("Score: " + String.valueOf(score));
 
-                    returnStr = "Added entry to datastore!";
-                    br.close();
-                    if(file.delete()){
-                        System.out.println(file.getName() + " is deleted!");
-                    }else{
-                        System.out.println("Delete operation is failed.");
+                        //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
+                        myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency).execute();
+                    } else if (entries[0].compareTo("event") == 0) {
+
+
+                        System.out.println("Event logged");
+                        long timeStamp = Long.parseLong(entries[1])/1000;
+                        int levelNo = Integer.parseInt(entries[2]);
+                        int evenType = Integer.parseInt(entries[3]);
+                        float cHealth = Float.parseFloat(entries[4]);
+                        long cScore = Long.parseLong(entries[5]);
+                        long cLScore = Long.parseLong(entries[6]);
+                        int barrelDecision = Integer.parseInt(entries[7]);
+                        int hazardType = Integer.parseInt(entries[8]);
+                        int distanceFromExit = Integer.parseInt(entries[9]);
+                        int levelDuration = Integer.parseInt(entries[10]);
+
+                        //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
+                        myApiService.uploadEventData(gameID, userName,(int)timeStamp, levelNo, evenType, (int)cHealth, (int)cScore, (int)cLScore, barrelDecision, hazardType, distanceFromExit, levelDuration).execute();
                     }
-                    return returnStr;
+
+
                 }
 
+                log = br.readLine();
+
             }
+
+            returnStr = "Added "+userName+"'s entry to datastore!";
+            br.close();
+            if(file.delete()){
+                System.out.println(file.getName() + " is deleted!");
+            }else{
+                System.out.println("Delete operation is failed.");
+            }
+            return returnStr;
 
 
         } catch (FileNotFoundException e) {

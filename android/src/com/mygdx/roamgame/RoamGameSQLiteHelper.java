@@ -108,6 +108,20 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
             return true;
     }
 
+    public String getUserName ()
+    {
+        String userName = null;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor resultSet = db.rawQuery("Select * From " + TABLE_PROFILES, null);
+        resultSet.moveToLast();
+        int ind = resultSet.getColumnIndex(COLUMN_EMAIL);
+        int rows = resultSet.getCount();
+        if (rows >= 1)
+            userName = resultSet.getString(ind);
+        return userName;
+
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(RoamGameSQLiteHelper.class.getName(),

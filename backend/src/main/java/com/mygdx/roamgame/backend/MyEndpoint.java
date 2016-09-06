@@ -34,7 +34,7 @@ public class MyEndpoint {
     @ApiMethod(name = "sayHi")
     public MyBean sayHi(@Named("name") String name) {
         MyBean response = new MyBean();
-        response.setData("Welcome back, " + name + "! Backend online.");
+        response.setData("Welcome back! Backend online.");
 
         //GameInfoData gInfo = new GameInfoData();
 
@@ -50,12 +50,25 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "uploadGameData")
-    public void uploadGameData(@Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency) {
+    public void uploadGameData(@Named("gameID") int gameID, @Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency) {
         //MyBean response = new MyBean();
 
-        GameInfoData gInfo = new GameInfoData(name, (long)score, (long)gameDuration, inputFrequency);
+        GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency);
         // save to datastore
         ofy().save().entity(gInfo).now();
+
+
+
+        //return response;
+    }
+
+    @ApiMethod(name = "uploadEventData")
+    public void uploadEventData(@Named("gameID") int gameID, @Named("userName") String userName, @Named("timestamp") int timeStamp, @Named("levelNo") int levelNo, @Named("evenType") int evenType ,@Named("currentHealth") int currentHealth, @Named("currentScore") int currentScore, @Named("currentLevelScore") int currentLevelScore, @Named("barrelDecision") int barrelDecision, @Named("hazardType") int hazardType, @Named("distanceFromExit") int distanceFromExit, @Named("levelDuration") int levelDuration)  {
+        //MyBean response = new MyBean();
+
+        EventInfoData eInfo = new EventInfoData((long)gameID, userName, (long)timeStamp, levelNo, evenType, (long)currentHealth, (long)currentScore, (long)currentLevelScore, barrelDecision, hazardType, distanceFromExit, levelDuration);
+        // save to datastore
+        ofy().save().entity(eInfo).now();
 
 
 

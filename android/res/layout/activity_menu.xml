@@ -17,31 +17,31 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_weight="1"/>
-    <Button
-        android:id="@+id/userGuideButton"
-        android:text="Roam Game User Guide"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/entireProfileButton"
-        android:layout_centerInParent="true"
-        android:layout_weight="1"/>
+    <!--<Button-->
+        <!--android:id="@+id/userGuideButton"-->
+        <!--android:text="Roam Game User Guide"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/entireProfileButton"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_weight="1"/>-->
     <Button
         android:id="@+id/startGameButton"
         android:text="Start Game"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/userGuideButton"
+        android:layout_below="@+id/entireProfileButton"
         android:layout_centerInParent="true"
         android:layout_weight="1"/>
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Take Questionnaire"
-        android:id="@+id/button_ius"
-        android:layout_below="@+id/startGameButton"
-        android:layout_centerInParent="true"
-        android:layout_weight="1"/>
+    <!--<Button-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Take Questionnaire"-->
+        <!--android:id="@+id/button_ius"-->
+        <!--android:layout_below="@+id/startGameButton"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_weight="1"/>-->
 
    <!-- <Button
         android:layout_width="fill_parent"

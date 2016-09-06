@@ -16,7 +16,8 @@ public class GameInfoData {
     Long gameDuration;
     int inputFrequency;
 
-    public GameInfoData(String u, Long s, Long gd, int inputf) {
+    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf) {
+        id = gameID;
         user = u;
         score = s;
         gameDuration = gd;

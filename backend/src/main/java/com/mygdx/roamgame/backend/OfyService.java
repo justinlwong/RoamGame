@@ -14,6 +14,7 @@ import com.googlecode.objectify.ObjectifyService;
 public class OfyService {
     static {
         ObjectifyService.register(GameInfoData.class);
+        ObjectifyService.register(EventInfoData.class);
     }
     public static Objectify ofy() {
         return ObjectifyService.ofy();
