@@ -2,6 +2,7 @@ package com.mygdx.roamgame.backend;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 /**
  * Created by Justin on 2016-08-30.
@@ -10,11 +11,15 @@ import com.googlecode.objectify.annotation.Id;
 public class GameInfoData {
 
     @Id
-    Long id;
-    String user;
-    Long score;
-    Long gameDuration;
-    int inputFrequency;
+    public Long id;
+    @Index
+    public String user;
+    @Index
+    public Long score;
+    @Index
+    public Long gameDuration;
+    @Index
+    public int inputFrequency;
 
     public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf) {
         id = gameID;

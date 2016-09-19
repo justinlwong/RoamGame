@@ -2,6 +2,7 @@ package com.mygdx.roamgame.backend;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 /**
  * Created by Justin on 2016-08-30.
@@ -10,19 +11,31 @@ import com.googlecode.objectify.annotation.Id;
 public class EventInfoData {
 
     @Id
-    Long id;
-    Long gameId;
-    String userName;
-    Long timestamp;
-    int levelNo;
-    int eventType;
-    Long currentHealth;
-    Long currentScore;
-    Long currentLevelScore;
-    int barrelDecision;
-    int hazardType;
-    int distanceFromExit;
-    int levelDuration;
+    public Long id;
+    @Index
+    public Long gameId;
+    @Index
+    public String userName;
+    @Index
+    public Long timestamp;
+    @Index
+    public int levelNo;
+    @Index
+    public int eventType;
+    @Index
+    public Long currentHealth;
+    @Index
+    public Long currentScore;
+    @Index
+    public Long currentLevelScore;
+    @Index
+    public int barrelDecision;
+    @Index
+    public int hazardType;
+    @Index
+    public int distanceFromExit;
+    @Index
+    public int levelDuration;
 
     public EventInfoData(Long gameId, String userName, Long t, int levelNo, int eT, Long cH, Long cS, Long cLS,  int bD, int hT, int dFE, int levelDuration) {
         this.gameId = gameId;
