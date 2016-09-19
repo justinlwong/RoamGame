@@ -7,12 +7,14 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -123,6 +125,7 @@ public class PlayState extends State {
     private Music music;
     private Sound pickupItemSound;
     private Sound deathSound;
+    private Music heartBeatSound;
 
     // Fonts
     BitmapFont font;
@@ -148,6 +151,10 @@ public class PlayState extends State {
     Dialog endLevelDialog;
     Skin skin;
     Stage stage;
+
+    // UI
+    ShapeRenderer srender;
+    Rectangle bloodScreen;
 
     // File
     FileHandle handle;
@@ -244,6 +251,7 @@ public class PlayState extends State {
         music.play();
         pickupItemSound = Gdx.audio.newSound(Gdx.files.internal("pickupSound.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
+        heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
 
         // Textures
         candyShop = new Texture("candyshop.png");
@@ -257,6 +265,10 @@ public class PlayState extends State {
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+
+        // UI
+        bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        srender = new ShapeRenderer();
 
         endLevelDialog = new Dialog("Finished Level " + levelCounter + "!", skin)
         {
@@ -677,7 +689,7 @@ public class PlayState extends State {
         }
 
         // Spawn new zombie every 2 seconds
-        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 10000 - levelCounter*150))
+        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 3000 - levelCounter*150))
             spawnZombie();
     }
 
@@ -715,6 +727,20 @@ public class PlayState extends State {
         accumulatedFactor2 += realTimeFactor2*dt;
         currentFactor1 = 1000f*accumulatedFactor1/(TimeUtils.millis() - gameStartTime);
         currentFactor2 = 1000f*accumulatedFactor2/(TimeUtils.millis() - gameStartTime);
+
+        if (healthBarVal >= 0.5f*maxHealthLosable)
+        {
+            if (!heartBeatSound.isPlaying())
+            {
+                heartBeatSound.setLooping(true);
+                heartBeatSound.play();
+            }
+            float volume =  2*((float)healthBarVal /maxHealthLosable - 0.5f);
+            heartBeatSound.setVolume(volume);
+        } else
+        {
+            heartBeatSound.pause();
+        }
         //System.out.println(realTimeTolerance);
 
         // Health decays with time spent in room
@@ -1041,6 +1067,22 @@ public class PlayState extends State {
 
         hb.end();
 
+        // draw blood screen
+        if (healthBarVal >= 0.5f*maxHealthLosable)
+        {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            srender.begin(ShapeRenderer.ShapeType.Filled);
+            float alpha = 2*((float)healthBarVal/maxHealthLosable - 0.5f);
+            System.out.println(alpha);
+            Color color = new Color(1f, 0f, 0f, alpha);
+            srender.setColor(color);
+            srender.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            srender.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        }
+
     }
 
     @Override
@@ -1150,6 +1192,7 @@ public class PlayState extends State {
         fb.dispose();
         bb.dispose();
         stage.dispose();
+        heartBeatSound.dispose();
     }
 
 }
