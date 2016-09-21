@@ -34,8 +34,13 @@ public class GameStateManager {
     }
 
     public void render(SpriteBatch sb, SpriteBatch hb) {
+
         states.peek().render(sb, hb);
     }
 
+    public void resume()
+    {
+        states.peek().resume();
+    }
 
 }

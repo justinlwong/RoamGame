@@ -126,4 +126,9 @@ public class ScoreScreenState extends State{
         font.dispose();
     }
 
+    @Override
+    public void resume() {
+
+    }
+
 }

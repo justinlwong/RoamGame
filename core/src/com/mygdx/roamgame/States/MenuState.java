@@ -49,5 +49,10 @@ public class MenuState extends State {
         playBtn.dispose();
     }
 
+    @Override
+    public void resume() {
+
+    }
+
 
 }

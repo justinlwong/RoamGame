@@ -67,7 +67,7 @@ public class Player {
     private float boostfactor;
 
 
-    public Player(int x, int y, int height, int width)
+    public Player(int x, int y, int height, int width, Texture person, Texture goo)
     {
         oldPosition = new Vector3(x, y, 0);
         position = new Vector3(x, y, 0);
@@ -80,14 +80,20 @@ public class Player {
         isSlowed = false;
 
         st = state.standby;
-        texture = new Texture("steverogers.png");
-        gooTexture = new Texture ("steverogers_goo.png");
+        texture = person;
+        gooTexture = goo;
         walkAnimation = new PlayerAnimation(new TextureRegion(texture), 4, 1.0f);
         gooWalkAnimation =  new PlayerAnimation(new TextureRegion(gooTexture), 4, 2.0f);
         bounds = new Rectangle(x+5, y+5, texture.getWidth()/6, texture.getHeight()/12);
         curDir = dir.up;
         curspeedmax = speedmax;
         curdiagspeedmax = diagspeedmax;
+    }
+
+    public void resume()
+    {
+        walkAnimation = new PlayerAnimation(new TextureRegion(texture), 4, 1.0f);
+        gooWalkAnimation =  new PlayerAnimation(new TextureRegion(gooTexture), 4, 2.0f);
     }
 
     public void keepMoving(dir d)
@@ -301,7 +307,7 @@ public class Player {
 
     public void dispose()
     {
-        texture.dispose();
-        gooTexture.dispose();
+        //texture.dispose();
+        //gooTexture.dispose();
     }
 }

@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
@@ -42,6 +43,8 @@ import java.util.Random;
  */
 
 public class PlayState extends State {
+
+
 
     public static final int SPRITE_SPACING = 16;
     public static final int GRID_UNIT = 32;
@@ -107,6 +110,8 @@ public class PlayState extends State {
     private Sprite dpadCrossSprite;
     Texture fb;
     Texture bb;
+    Texture person;
+    Texture gooTexture;
 
     float diffX = 0;
     float diffY = 0;
@@ -151,6 +156,7 @@ public class PlayState extends State {
     Dialog endLevelDialog;
     Skin skin;
     Stage stage;
+    private boolean dialogShowing;
 
     // UI
     ShapeRenderer srender;
@@ -225,7 +231,9 @@ public class PlayState extends State {
         lastPoisonedTime = 0;
 
         // game features / interactables
-        player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth);
+        person = new Texture("steverogers.png");
+        gooTexture = new Texture ("steverogers_goo.png");
+        player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
         food = new Food();
         foodSupplies = new Array<Rectangle>();
         poisonGrass = new PoisonGrass();
@@ -262,9 +270,12 @@ public class PlayState extends State {
 
         // dialog setup
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        float scaleFactor = Gdx.graphics.getWidth()/ 1080f;
+        skin.getFont("default-font").getData().setScale(scaleFactor, scaleFactor);
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+        dialogShowing = false;
 
         // UI
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -305,7 +316,10 @@ public class PlayState extends State {
         endLevelDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
         endLevelDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
         endLevelDialog.button("Continue at your own peril", 1L);
-        endLevelDialog.button("Redeem level points and Cash out!", 2L);
+        endLevelDialog.button("Cash out!", 2L);
+
+        Window.WindowStyle style = new Window.WindowStyle();
+        style.titleFont = bfont;
 
         barrelChooseDialog = new Dialog("Points or health?", skin)
         {
@@ -359,13 +373,13 @@ public class PlayState extends State {
                     pickupItemSound.play(0.5f);
                 }
 
-
+                dialogShowing = false;
 
 
             }
         };
 
-        barrelChooseDialog.setSkin(skin);
+        //barrelChooseDialog.setSkin(skin);
 
 
 
@@ -377,8 +391,15 @@ public class PlayState extends State {
 
 
 
+    }
 
-
+    @Override
+    public void resume() {
+        Gdx.app.log("resume", startRoom.getStartingPosX() + " " + startRoom.getStartingPosY());
+        // camera related info
+        cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
+        //player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
+        //player.resume();
     }
 
     @Override
@@ -542,6 +563,7 @@ public class PlayState extends State {
                 // health boost for high value
                 //if (occupiedSubMazeGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] == 2) {
                 barrelChooseDialog.show(stage);
+                dialogShowing = true;
 
 
                 //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
@@ -739,7 +761,8 @@ public class PlayState extends State {
             heartBeatSound.setVolume(volume);
         } else
         {
-            heartBeatSound.pause();
+            if(heartBeatSound.isPlaying())
+                heartBeatSound.pause();
         }
         //System.out.println(realTimeTolerance);
 
@@ -767,26 +790,33 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
-        handleInput();
-        player.update(dt);
+        if (!dialogShowing) {
+            handleInput();
+            player.update(dt);
 
-        // make sure this is called after player update
-        checkPlayerBounds();
-        cam.position.x = Math.round(player.getPosition().x);
-        cam.position.y = Math.round(player.getPosition().y);
+            // make sure this is called after player update
+            checkPlayerBounds();
+            Gdx.app.log("Position", player.getPosition().x + " " + player.getPosition().y);
 
-        if (location == 0) {
+            cam.position.x = Math.round(player.getPosition().x);
+            cam.position.y = Math.round(player.getPosition().y);
+
+            if (location == 0) {
 
 
-        } else if (location == 1)
-        {
-            updateFood(dt);
-            updateHazards(dt);
-            updateRedPoison(dt);
-            //updateSubMazeZombie(dt);
+            } else if (location == 1) {
+                updateFood(dt);
+                updateHazards(dt);
+                updateRedPoison(dt);
+                //updateSubMazeZombie(dt);
+            }
+            //updateHealthPack();
+
+
+            updateGameInfo(dt);
+
         }
-        //updateHealthPack();
-        updateGameInfo(dt);
+
         cam.update();
     }
 
@@ -1193,6 +1223,8 @@ public class PlayState extends State {
         bb.dispose();
         stage.dispose();
         heartBeatSound.dispose();
+        person.dispose();
+        gooTexture.dispose();
     }
 
 }
