@@ -16,30 +16,30 @@ public class UserProfileActivity extends Activity {
         setContentView(R.layout.activity_user_profile);
 
         final EditText et_uname = (EditText) findViewById(R.id.et_uname);
-        et_uname.setText("User Demo");
-        final EditText et_fname = (EditText) findViewById(R.id.et_fname);
-        et_fname.setText("John");
-        final EditText et_lname = (EditText) findViewById(R.id.et_lname);
-        et_lname.setText("Smith");
-        final EditText et_age = (EditText) findViewById(R.id.et_age);
-        et_age.setText("27");
-        final EditText et_gender = (EditText) findViewById(R.id.et_gender);
-        et_gender.setText("Male");
+        et_uname.setText(MenuActivity.userDB.getUserName());
+//        final EditText et_fname = (EditText) findViewById(R.id.et_fname);
+//        et_fname.setText("John");
+//        final EditText et_lname = (EditText) findViewById(R.id.et_lname);
+//        et_lname.setText("Smith");
+//        final EditText et_age = (EditText) findViewById(R.id.et_age);
+//        et_age.setText("27");
+//        final EditText et_gender = (EditText) findViewById(R.id.et_gender);
+//        et_gender.setText("Male");
         Button submitButton = (Button)findViewById(R.id.button_submit);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //save user profile info
                 String username = et_uname.getText().toString();
-                String fname = et_fname.getText().toString();
-                String lname = et_lname.getText().toString();
-                String gender = et_gender.getText().toString();
-                String age = et_age.getText().toString();
+                String fname = "John";//et_fname.getText().toString();
+                String lname = "Smith";//et_lname.getText().toString();
+                String gender = "Male";//et_gender.getText().toString();
+                String age = "27";//et_age.getText().toString();
 
-                if (username.isEmpty() || fname.isEmpty() || lname.isEmpty() || gender.isEmpty() || age.isEmpty() ) {
+                if (username.isEmpty()) {// || fname.isEmpty() || lname.isEmpty() || gender.isEmpty() || age.isEmpty() ) {
                     Toast.makeText(getApplicationContext(), "Please fill in all the fields.", Toast.LENGTH_LONG).show();
                 } else {
-                    Integer ageI = Integer.parseInt(et_age.getText().toString());
+                    Integer ageI = Integer.parseInt(age);//et_age.getText().toString());
                     boolean val = MenuActivity.userDB.insertProfile(username, fname, lname, gender, ageI);
                     if (!val) {
                         Toast.makeText(getApplicationContext(), "User name already chosen, please choose another name", Toast.LENGTH_LONG).show();

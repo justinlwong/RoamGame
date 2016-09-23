@@ -2,7 +2,9 @@ package com.mygdx.roamgame.States;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -34,7 +36,6 @@ import com.mygdx.roamgame.sprites.PoisonGrass;
 import com.mygdx.roamgame.sprites.Zombie;
 
 
-import java.sql.Time;
 import java.util.Random;
 
 
@@ -44,7 +45,7 @@ import java.util.Random;
 
 public class PlayState extends State {
 
-
+    InputMultiplexer im = new InputMultiplexer();
 
     public static final int SPRITE_SPACING = 16;
     public static final int GRID_UNIT = 32;
@@ -79,7 +80,7 @@ public class PlayState extends State {
     private float maxDistance;
     private float maxDistanceSubMaze;
     private boolean isTouched = false;
-    private int levelScore = 1;
+    private int levelScore = 0;
     private long levelStartTime;
     private long levelDuration;
 
@@ -105,6 +106,7 @@ public class PlayState extends State {
     private Array<Rectangle> zombiesBounds;
 
     // Textures
+    AssetManager manager = new AssetManager();
     private Texture candyShop;
     private Texture dpadCross;
     private Sprite dpadCrossSprite;
@@ -162,8 +164,25 @@ public class PlayState extends State {
     ShapeRenderer srender;
     Rectangle bloodScreen;
 
+    int [][]touchArray = new int[][]
+    {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
+    {4, 4, 1, 1, 1, 1, 1, 1, 1, 2, 2},
+    {4, 4, 4, 1, 1, 1, 1, 1, 2, 2, 2},
+    {4, 4, 4, 4, 1, 1, 1, 2, 2, 2, 2},
+    {4, 4, 4, 4, 4, 0, 2, 2, 2, 2, 2},
+    {4, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2},
+    {4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2},
+    {4, 4, 3, 3, 3, 3, 3, 3, 3, 2, 2},
+    {4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2},
+    {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}};
     // File
     FileHandle handle;
+
+    private boolean resumeFlag= false;
+    private int barrelsAcquired;
+    private int lastLevelScore;
+    private Sound splashSound;
 
     public class PoisonObject
     {
@@ -200,21 +219,24 @@ public class PlayState extends State {
 
         return sprite;
     }
+//
+//    public void loadAssets()
+//    {
+//        manager.load("steverogers.png", Texture.class);
+//        manager.load("steverogers_goo.png", Texture.class);
+//        manager.load("bar.png", Texture.class);
+//        manager.load("bar_back.png", Texture.class);
+//        manager.load("transparentDark07.png", Texture.class);
+//    }
 
 
     protected PlayState(final GameStateManager gsm) {
         super(gsm);
 
-        // file
-        System.out.println(Gdx.files.getLocalStoragePath());
-        handle = Gdx.files.local("gameInfoLog.txt");
-        //handle.writeString("Hello!", true);
-        // environments
-        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 4, 8, 2);
-        subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
 
-        // camera related info
-        cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
+
+        // file
+        handle = Gdx.files.local("gameInfoLog.txt");
 
         // state related info
         score = 0;
@@ -229,27 +251,55 @@ public class PlayState extends State {
         prefs = Gdx.app.getPreferences("Stats");
         lastHitTime = 0;
         lastPoisonedTime = 0;
+        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
+        subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
+
+        person = new Texture("steverogers.png");
+        gooTexture = new Texture ("steverogers_goo.png");
+        player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
+
+        initTextures();
+
+        zombiesBounds = new Array<Rectangle>();
+        redPoisonArr = new Array<PoisonObject>();
+        foodSupplies = new Array<Rectangle>();
+
+        spawnInitialBarrels();
+
+        Gdx.input.setInputProcessor(im);
+    }
+
+    public void initTextures()
+    {
+
+        //handle.writeString("Hello!", true);
+        // environments
+
+        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
+        subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
+        // camera related info
+        cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
 
         // game features / interactables
         person = new Texture("steverogers.png");
         gooTexture = new Texture ("steverogers_goo.png");
-        player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
+        player.loadTextures(person, gooTexture);
+
         food = new Food();
-        foodSupplies = new Array<Rectangle>();
         poisonGrass = new PoisonGrass();
-        redPoisonArr = new Array<PoisonObject>();
         zombies = new Array<Zombie>();
-        zombiesBounds = new Array<Rectangle>();
-        spawnInitialBarrels();
 
         // font related info
         float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
         generator = new FreeTypeFontGenerator(Gdx.files.internal("bebas.ttf"));
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = (int)(screenScale*( 20 ));//+ (int)((1f - alpha)*20f)));
-        parameter.characters = "0123456789+-Gained!*pointshealthEnteringLevelCongratsReceivebonus ";
+
+        parameter.size = (int)(screenScale*( 30 ));//+ (int)((1f - alpha)*20f)));
+        //parameter.characters = "0123456789+-Gained!*pointshealthEnteringLevelCongratsReceivebonus ";
         bfont = generator.generateFont(parameter);
         generator.dispose();
+        System.out.println("space " + bfont.getSpaceWidth());
+
         font = new BitmapFont();
 
         // music and sounds
@@ -259,10 +309,10 @@ public class PlayState extends State {
         music.play();
         pickupItemSound = Gdx.audio.newSound(Gdx.files.internal("pickupSound.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
+        splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
         heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
 
         // Textures
-        candyShop = new Texture("candyshop.png");
         fb = new Texture("bar.png");
         bb = new Texture("bar_back.png");
         dpadCross = new Texture("transparentDark07.png");
@@ -270,23 +320,24 @@ public class PlayState extends State {
 
         // dialog setup
         skin = new Skin(Gdx.files.internal("uiskin.json"));
-        float scaleFactor = Gdx.graphics.getWidth()/ 1080f;
+        float scaleFactor = Gdx.graphics.getWidth()/ 720f;
         skin.getFont("default-font").getData().setScale(scaleFactor, scaleFactor);
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        im.addProcessor(stage);
+        //Gdx.input.setInputProcessor(stage);
         dialogShowing = false;
 
         // UI
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         srender = new ShapeRenderer();
 
-        endLevelDialog = new Dialog("Finished Level " + levelCounter + "!", skin)
+        endLevelDialog = new Dialog("Finished Level!", skin)
         {
             @Override
             public float getPrefWidth() {
                 // force dialog width
-                return Gdx.graphics.getWidth();
+                return 0.8f*Gdx.graphics.getWidth();
             }
 
             @Override
@@ -314,8 +365,9 @@ public class PlayState extends State {
         };
 
         endLevelDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        endLevelDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
-        endLevelDialog.button("Continue at your own peril", 1L);
+        endLevelDialog.getButtonTable().defaults().width(0.4f*Gdx.graphics.getWidth());
+        endLevelDialog.button("Continue at\nyour own peril", 1L);
+
         endLevelDialog.button("Cash out!", 2L);
 
         Window.WindowStyle style = new Window.WindowStyle();
@@ -338,8 +390,8 @@ public class PlayState extends State {
             protected void result(Object object)
             {
 
-                int baseScore = MathUtils.random(5,10);
-                int scoreAmount = (levelCounter + 1)*baseScore;
+                int baseScore = MathUtils.random(2,7);
+                int scoreAmount =  baseScore;
 
                 System.out.println("Option: " + object);
 
@@ -350,16 +402,17 @@ public class PlayState extends State {
 
                 if (selected == 1)
                 {
-                    healthBarVal -= 0.05f * maxHealthLosable;
+                    barrelsAcquired += 1;
+                    healthBarVal -= 0.08f * maxHealthLosable;
                     player.boostPlayer(1.5f);
-                    if (healthBarVal < 0)
-                        healthBarVal = 0;
+                    //if (healthBarVal < 0)
+                    //    healthBarVal = 0;
                     lastBarrelScore = scoreAmount;
                     scoreAnimationStart = TimeUtils.millis();
                     scoreAnimation = true;
                     // Play sound
                     pickupItemSound.play(0.5f);
-                    levelScore *= scoreAmount;
+                    levelScore += scoreAmount*barrelsAcquired;
                 } else if (selected == 2)
                 {
                     lastHealthAdded = 4*baseScore;
@@ -386,18 +439,29 @@ public class PlayState extends State {
         barrelChooseDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
         barrelChooseDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 4);
 
+        //barrelChooseDialog.getContentTable().defaults().height(0.1f* Gdx.graphics.getHeight());
+
         barrelChooseDialog.button("Points", 1L);
         barrelChooseDialog.button("Health", 2L);
-
-
-
     }
 
     @Override
+    public void pause() {
+        this.dispose();
+    }
+
+
+    @Override
     public void resume() {
-        Gdx.app.log("resume", startRoom.getStartingPosX() + " " + startRoom.getStartingPosY());
+
         // camera related info
         cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
+
+        // Reload Textures
+        initTextures();
+
+        Gdx.app.log("resume", startRoom.getStartingPosX() + " " + startRoom.getStartingPosY() + " " + player.getPosition().x + " " + player.getPosition().y);
+        resumeFlag = true;
         //player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
         //player.resume();
     }
@@ -408,7 +472,6 @@ public class PlayState extends State {
         //String logData = String.valueOf(TimeUtils.nanoTime() - gameStartTime) + " " ;
         //boolean isMoved = false;
         isTouched = false;
-
 
         if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             //logData += "Up";
@@ -443,41 +506,28 @@ public class PlayState extends State {
         {
             inputRegistered += 1;
             isTouched = true;
-            Vector3 tmp=new Vector3(Gdx.input.getX(),Gdx.graphics.getHeight() - Gdx.input.getY(), 0);
+            //System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
+            int index_row = (int)(11f*(float)Gdx.input.getY() / (float)Gdx.graphics.getHeight());
+            int index_col = (int)(11f*(float)Gdx.input.getX() / (float)Gdx.graphics.getWidth());
+            //System.out.println(index_col+ " " + index_row);
+            if (index_row >= 0 && index_row < 11 && index_col >= 0 && index_col < 11) {
+                if (touchArray[index_row][index_col] == 1) {
+                    player.moveUp();
+                }
 
-            //System.out.println(tmp.x+ " " + tmp.y + " " + leftPad.x + " " + leftPad.y + " " + rightPad.x + " " + rightPad.y +  " " + upPad.x + " " + upPad.y +  " " + downPad.x + " " + downPad.y);
-            if(leftPad.contains(tmp.x,tmp.y))
-            {
-                player.moveLeft();
+                if (touchArray[index_row][index_col] == 2) {
+                    player.moveRight();
+                }
+
+                if (touchArray[index_row][index_col] == 3) {
+                    player.moveDown();
+                }
+
+                if (touchArray[index_row][index_col] == 4) {
+                    player.moveLeft();
+                }
             }
-            else if(rightPad.contains(tmp.x,tmp.y))
-            {
-                player.moveRight();
-            }
-            else if(upPad.contains(tmp.x,tmp.y))
-            {
-                player.moveUp();
-            }
-            else if(downPad.contains(tmp.x,tmp.y))
-            {
-                player.moveDown();
-            }
-            else if (leftUpPad.contains(tmp.x, tmp.y))
-            {
-                player.moveLeftUp();
-            }
-            else if (rightUpPad.contains(tmp.x, tmp.y))
-            {
-                player.moveRightUp();
-            }
-            else if (leftDownPad.contains(tmp.x, tmp.y))
-            {
-                player.moveLeftDown();
-            }
-            else if (rightDownPad.contains(tmp.x, tmp.y))
-            {
-                player.moveRightDown();
-            }
+
         }
 
         //logData += "\n";
@@ -591,7 +641,7 @@ public class PlayState extends State {
 
             Rectangle item = redPoisonArr.get(index).rect;
             if (item.overlaps(player.getBounds()) && (TimeUtils.millis() - lastPoisonedTime) > 2*SEC) {
-                deathSound.play(0.7f);
+                splashSound.play(0.7f);
                 healthBarVal+=5;
                 player.slowPlayer();
                 lastPoisonedTime = TimeUtils.millis();
@@ -711,7 +761,7 @@ public class PlayState extends State {
         }
 
         // Spawn new zombie every 2 seconds
-        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 3000 - levelCounter*150))
+        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(2000, 5000 - levelCounter*150))
             spawnZombie();
     }
 
@@ -793,10 +843,17 @@ public class PlayState extends State {
         if (!dialogShowing) {
             handleInput();
             player.update(dt);
-
+            if (resumeFlag == true)
+            {
+                Gdx.app.log("resumed before", player.getPosition().x + " " + player.getPosition().y);
+            }
             // make sure this is called after player update
             checkPlayerBounds();
-            Gdx.app.log("Position", player.getPosition().x + " " + player.getPosition().y);
+            if (resumeFlag == true)
+            {
+                Gdx.app.log("resumed after check bounds", player.getPosition().x + " " + player.getPosition().y);
+            }
+            //Gdx.app.log("Position", player.getPosition().x + " " + player.getPosition().y);
 
             cam.position.x = Math.round(player.getPosition().x);
             cam.position.y = Math.round(player.getPosition().y);
@@ -814,10 +871,17 @@ public class PlayState extends State {
 
 
             updateGameInfo(dt);
-
+            if (resumeFlag == true)
+            {
+                Gdx.app.log("resumed after gameinfo", player.getPosition().x + " " + player.getPosition().y);
+            }
         }
 
         cam.update();
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed after cam update", player.getPosition().x + " " + player.getPosition().y);
+        }
     }
 
     private void checkPlayerBounds()
@@ -865,9 +929,12 @@ public class PlayState extends State {
                 // level up
                 levelCounter += 1;
 
-                bonusAmount = (levelCounter + 1)*levelScore;
-                score += levelScore + bonusAmount;
-                levelScore = 1;
+                //bonusAmount = (levelCounter + 1)*levelScore;
+                score += levelScore; // + bonusAmount;
+
+                lastLevelScore = levelScore;
+                levelScore = 0;
+                barrelsAcquired = 0;
 
                 endLevelAnimation = true;
                 endLevelAnimationStart = TimeUtils.millis();
@@ -923,9 +990,16 @@ public class PlayState extends State {
                 Vector3 newPosition = new Vector3(5* GRID_UNIT, 1*GRID_UNIT, 0);
                 player.setPosition(newPosition);
             }
-
+            if (resumeFlag == true)
+            {
+                Gdx.app.log("resumed before player draw", player.getPosition().x + " " + player.getPosition().y);
+            }
             sb.draw(player.getTexture(), player.getPosition().x, player.getPosition().y);
+            if (resumeFlag == true)
+            {
+                Gdx.app.log("resumed after player draw", player.getPosition().x + " " + player.getPosition().y);
 
+            }
 
             sb.end();
             transitionFrame = false;
@@ -959,6 +1033,7 @@ public class PlayState extends State {
             }
 
             sb.draw(player.getTexture(), player.getPosition().x, player.getPosition().y);
+
             sb.end();
             transitionFrame = false;
 
@@ -985,7 +1060,11 @@ public class PlayState extends State {
             frontBar.draw(hb, positionBar.x, positionBar.y, fbVal, 0.03f*Gdx.graphics.getHeight());
 
         // Draw Score
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed in hud", player.getPosition().x + " " + player.getPosition().y);
 
+        }
         Vector3 positionScore = new Vector3(0.03f*Gdx.graphics.getWidth(),0.9625f*Gdx.graphics.getHeight(), 0);
         font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         //font.draw(hb, "Score : " + String.valueOf(score), positionScore.x, positionScore.y);
@@ -1008,14 +1087,23 @@ public class PlayState extends State {
 
         textStyle = new Label.LabelStyle();
         textStyle.font = font;
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed in hud2", player.getPosition().x + " " + player.getPosition().y);
 
+        }
         if (scoreAnimation) {
-
-            float alpha = (1f - ((float)(TimeUtils.millis() - scoreAnimationStart)/3000f));
-
+            String suffix = "th";
+            float alpha = (1f - ((float)(TimeUtils.millis() - scoreAnimationStart)/5000f));
+            if (barrelsAcquired == 1)
+                suffix = "st";
+            else if (barrelsAcquired == 2)
+                suffix = "nd";
+            else if (barrelsAcquired == 3)
+                suffix = "rd";
             bfont.setColor(new Color(255, 255, 0, alpha));
-            bfont.draw(hb, "* "+lastBarrelScore + " points!", Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-            if (TimeUtils.millis() - scoreAnimationStart > 3000 )
+            bfont.draw(hb, "+   " +barrelsAcquired+ suffix+"   barrel * "+lastBarrelScore + "   =   " + barrelsAcquired*lastBarrelScore+ "   points!", Gdx.graphics.getWidth() / 8, Gdx.graphics.getHeight() / 2);
+            if (TimeUtils.millis() - scoreAnimationStart > 5000 )
             {
                 scoreAnimation = false;
             }
@@ -1024,11 +1112,11 @@ public class PlayState extends State {
 
         if (healthAnimation) {
 
-            float alpha = (1f - ((float)(TimeUtils.millis() - healthAnimationStart)/3000f));
+            float alpha = (1f - ((float)(TimeUtils.millis() - healthAnimationStart)/5000f));
 
             bfont.setColor(new Color(255, 255, 255, alpha));
             bfont.draw(hb, "+ "+lastHealthAdded + " health!", Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-            if (TimeUtils.millis() - healthAnimationStart > 3000 )
+            if (TimeUtils.millis() - healthAnimationStart > 5000 )
             {
                 healthAnimation = false;
             }
@@ -1039,7 +1127,7 @@ public class PlayState extends State {
             float alpha = (1f - ((float)(TimeUtils.millis() - 500 - levelAnimationStart)/2500f));
             if ((TimeUtils.millis() - levelAnimationStart > 500) ) {
                 bfont.setColor(new Color(255, 255, 255, alpha));
-                bfont.draw(hb, "Entering Level " + (levelCounter + 1) + "!", (int)(0.35f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
+                bfont.draw(hb, "Entering   Level   " + (levelCounter + 1) + "!", (int)(0.35f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
             }
             if ((TimeUtils.millis() - levelAnimationStart > 3000) )
             {
@@ -1052,22 +1140,32 @@ public class PlayState extends State {
             float alpha = (1f - ((float)(TimeUtils.millis() - 500 - endLevelAnimationStart)/2500f));
             if ((TimeUtils.millis() - endLevelAnimationStart > 500) ) {
                 bfont.setColor(new Color(255, 255, 0, alpha));
-                bfont.draw(hb, "Congrats! Receive " + bonusAmount + " points!", (int)(0.25f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
+                bfont.draw(hb, "Congrats!   Received   " + lastLevelScore + "   points!", (int)(0.10f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
             }
             if ((TimeUtils.millis() - endLevelAnimationStart > 3000) )
             {
                 endLevelAnimation = false;
             }
         }
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed in hud3", player.getPosition().x + " " + player.getPosition().y);
 
+        }
 //        textTolerance = new Label("Current Health: " + String.valueOf((int)(100*(1 - (healthBarVal/maxHealthLosable)))) , textStyle);
-        textTolerance = new Label("Level Score: " + String.valueOf(levelScore) , textStyle);
+        textTolerance = new Label("Level " + String.valueOf(levelCounter+1) + " Score: " + String.valueOf(levelScore) , textStyle);
         //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
         textTolerance.setFontScale(screenScale, screenScale);
         textTolerance.setPosition(positionScore.x, positionScore.y - 0.03f * Gdx.graphics.getHeight());
 
         textTolerance.draw(hb, 2f);
 
+
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed in hud4", player.getPosition().x + " " + player.getPosition().y);
+
+        }
 //        textTolerance = new Label("Touched?: " + String.valueOf(isTouched), textStyle);
 //        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
 //        textTolerance.setFontScale(screenScale, screenScale);
@@ -1084,13 +1182,13 @@ public class PlayState extends State {
 
 
         // Draw direction pad
-        Vector3 dPadPosition = new Vector3(0.60f * Gdx.graphics.getWidth(), 0.04f*Gdx.graphics.getHeight(), 0);
-        //Color c = hb.getColor();
-        //hb.setColor(c.r, c.g, c.b, .3f);//set alpha to 0.3
-        //hb.draw(dpadCircle,dPadPosition.x, dPadPosition.y);
-        dpadCrossSprite.setPosition(dPadPosition.x, dPadPosition.y);
-        dpadCrossSprite.setAlpha(.3f);
-        dpadCrossSprite.draw(hb);
+//        Vector3 dPadPosition = new Vector3(0.60f * Gdx.graphics.getWidth(), 0.04f*Gdx.graphics.getHeight(), 0);
+//        //Color c = hb.getColor();
+//        //hb.setColor(c.r, c.g, c.b, .3f);//set alpha to 0.3
+//        //hb.draw(dpadCircle,dPadPosition.x, dPadPosition.y);
+//        dpadCrossSprite.setPosition(dPadPosition.x, dPadPosition.y);
+//        dpadCrossSprite.setAlpha(.3f);
+//        dpadCrossSprite.draw(hb);
 
         //hb.draw(dpadCrossSprite, dPadPosition.x, dPadPosition.y);
         //hb.setColor(c.r, c.g, c.b, 1f);
@@ -1103,7 +1201,7 @@ public class PlayState extends State {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             srender.begin(ShapeRenderer.ShapeType.Filled);
-            float alpha = 2*((float)healthBarVal/maxHealthLosable - 0.5f);
+            float alpha = 1.25f*((float)healthBarVal/maxHealthLosable - 0.5f);
             System.out.println(alpha);
             Color color = new Color(1f, 0f, 0f, alpha);
             srender.setColor(color);
@@ -1123,6 +1221,12 @@ public class PlayState extends State {
 
         stage.act();
         stage.draw();
+
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed in render", player.getPosition().x + " " + player.getPosition().y);
+            resumeFlag = false;
+        }
     }
 
 //    private void spawnFood() {
@@ -1209,8 +1313,8 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-        player.dispose();
-        candyShop.dispose();
+        //player.dispose();
+        Gdx.app.log("paused", "disposing");
         if (food!=null)
             food.dispose();
         if(poisonGrass!=null)

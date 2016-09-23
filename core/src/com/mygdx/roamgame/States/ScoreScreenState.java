@@ -127,6 +127,11 @@ public class ScoreScreenState extends State{
     }
 
     @Override
+    public void pause() {
+
+    }
+
+    @Override
     public void resume() {
 
     }

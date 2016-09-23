@@ -43,4 +43,6 @@ public class GameStateManager {
         states.peek().resume();
     }
 
+    public void pause() {states.peek().pause();}
+
 }
