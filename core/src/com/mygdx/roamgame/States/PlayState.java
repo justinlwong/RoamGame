@@ -298,7 +298,7 @@ public class PlayState extends State {
         //parameter.characters = "0123456789+-Gained!*pointshealthEnteringLevelCongratsReceivebonus ";
         bfont = generator.generateFont(parameter);
         generator.dispose();
-        System.out.println("space " + bfont.getSpaceWidth());
+        //System.out.println("space " + bfont.getSpaceWidth());
 
         font = new BitmapFont();
 
@@ -398,7 +398,7 @@ public class PlayState extends State {
                 int selected = Integer.parseInt(object.toString());
 
                 // log event
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 1 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " " + String.valueOf(selected) + " 0 0 0\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 1 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " " + String.valueOf(selected) + " 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
 
                 if (selected == 1)
                 {
@@ -646,7 +646,7 @@ public class PlayState extends State {
                 player.slowPlayer();
                 lastPoisonedTime = TimeUtils.millis();
 
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 2 0 0\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 2 0 0" + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
 
 
             }
@@ -737,7 +737,7 @@ public class PlayState extends State {
                     lastHitTime = TimeUtils.millis();
 
                     // log event
-                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0\n", true);
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
 
                 }
             }
@@ -763,6 +763,27 @@ public class PlayState extends State {
         // Spawn new zombie every 2 seconds
         if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(2000, 5000 - levelCounter*150))
             spawnZombie();
+    }
+
+    public int closestZombieDistance()
+    {
+        float min = 1000;
+        for (Zombie z : zombies)
+        {
+            float diff = Math.abs(z.getPosition().x - player.getPosition().x) + Math.abs(z.getPosition().y - player.getPosition().y);
+            if (diff < min)
+            {
+                min = diff;
+            }
+        }
+
+        return (int)min;
+    }
+
+    public int exitDistance()
+    {
+        float dist = Math.abs(subMaze.getExitRectangle().x - player.getPosition().x) + Math.abs(subMaze.getExitRectangle().y - player.getPosition().y);
+        return (int)dist;
     }
 
     private void updateGameInfo(float dt)
@@ -924,7 +945,7 @@ public class PlayState extends State {
                 levelDuration = TimeUtils.millis() - levelStartTime;
 
                 // log info
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 3 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + "\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 3 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
 
                 // level up
                 levelCounter += 1;
@@ -1202,7 +1223,7 @@ public class PlayState extends State {
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             srender.begin(ShapeRenderer.ShapeType.Filled);
             float alpha = 1.25f*((float)healthBarVal/maxHealthLosable - 0.5f);
-            System.out.println(alpha);
+            //System.out.println(alpha);
             Color color = new Color(1f, 0f, 0f, alpha);
             srender.setColor(color);
             srender.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
