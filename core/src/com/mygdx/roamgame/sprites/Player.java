@@ -217,8 +217,8 @@ public class Player {
         if (position.y < 0)
             position.y = 0;
 
-        if (position.y > (gameHeight - getTexture().getRegionHeight()))
-            position.y = gameHeight - getTexture().getRegionHeight();
+        if (position.y > (gameHeight))// - getTexture().getRegionHeight()))
+            position.y = gameHeight;// - getTexture().getRegionHeight();
 
         if (resumeFlag == true)
         {

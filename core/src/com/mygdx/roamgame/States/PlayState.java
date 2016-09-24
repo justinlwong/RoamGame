@@ -455,8 +455,8 @@ public class PlayState extends State {
             protected void result(Object object)
             {
 
-                int baseScore = MathUtils.random(2,7);
-                int scoreAmount =  baseScore;
+                int baseScore = MathUtils.random(6,21);
+                int scoreAmount =  (int)(((float)(levelCounter+1)/3f)*(float)baseScore);
 
                 System.out.println("Option: " + object);
 
@@ -565,7 +565,7 @@ public class PlayState extends State {
         }
 
         if (Gdx.input.justTouched()) {
-            System.out.println("just touched");
+            //System.out.println("just touched");
             lastTouchedPointX = Gdx.input.getX();
             lastTouchedPointY = Gdx.input.getY();
 
@@ -591,9 +591,9 @@ public class PlayState extends State {
             //if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
 
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    System.out.println("changing direction right left");
+                    //System.out.println("changing direction right left");
                     if (deltaX > 0) {
-                        System.out.println("moving right");
+                        //System.out.println("moving right");
                         direction_filter[0] = 1;
 
 
@@ -605,7 +605,7 @@ public class PlayState extends State {
 
 
                 } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
-                    System.out.println("changing direction up down");
+                    //System.out.println("changing direction up down");
                     if (deltaY > 0) {
                         direction_filter[0] = 3;
 
