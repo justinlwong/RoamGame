@@ -421,7 +421,7 @@ public class PlayState extends State {
                     prefs.putInteger("factor1", (int)currentFactor1);
                     prefs.putInteger("factor2", (int)currentFactor2);
                     prefs.flush();
-                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), true);
+                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
                     gsm.set(new ScoreScreenState(gsm));
                 }
 
