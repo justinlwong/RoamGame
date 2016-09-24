@@ -50,7 +50,7 @@ public class Player {
     private boolean isSlowed;
     private boolean isBoosted;
 
-    static float speedmax = 320f;
+    static float speedmax = 300f;
 
     static float slowDamping = 0.98f;
 
@@ -129,7 +129,27 @@ public class Player {
     public float getSpeedSum(){return Math.abs(speed.x) + Math.abs(speed.y);}
 
     public void update (float dt) {
+        // check if keep moving flag is on
+        if ((Gdx.input.isTouched() == true )&& (st == st.walking))
+        {
+            if (curDir  == dir.down)
+                moveDown();
+            else if (curDir  == dir.up)
+                moveUp();
+            else if (curDir  == dir.right)
+                moveRight();
+            else if (curDir  == dir.left)
+                moveLeft();
+//            else if (curDir  == dir.leftdown)
+//                moveLeftDown();
+//            else if (curDir  == dir.leftup)
+//                moveLeftUp();
+//            else if (curDir  == dir.rightdown)
+//                moveRightDown();
+//            else if (curDir  == dir.rightup)
+//                moveRightUp();
 
+        }
         if (isBoosted)
         {
             curspeedmax = speedmax*boostfactor;

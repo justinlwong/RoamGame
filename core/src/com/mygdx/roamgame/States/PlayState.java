@@ -28,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.roamgame.MovementGestureDetector;
 import com.mygdx.roamgame.RoamGame;
 import com.mygdx.roamgame.sprites.Environment;
 import com.mygdx.roamgame.sprites.Food;
@@ -128,6 +129,10 @@ public class PlayState extends State {
     private Rectangle leftDownPad;
     private Rectangle rightDownPad;
 
+    private int lastTouchedPointX;
+    private int lastTouchedPointY;
+    private int [] direction_filter = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
     // Music and Sounds
     private Music music;
     private Sound pickupItemSound;
@@ -159,6 +164,7 @@ public class PlayState extends State {
     Skin skin;
     Stage stage;
     private boolean dialogShowing;
+    private boolean endDialogShowing;
 
     // UI
     ShapeRenderer srender;
@@ -265,7 +271,63 @@ public class PlayState extends State {
         foodSupplies = new Array<Rectangle>();
 
         spawnInitialBarrels();
-
+//        MovementGestureDetector mgd = new MovementGestureDetector(new MovementGestureDetector.DirectionListener() {
+//            //            @Override
+////            public void onTouched(float x, float y)
+////            {
+////                player.move(x, y);
+////            }
+//            @Override
+//            public void onUp() {
+//                player.moveUp();
+//                player.keepMoving(Player.dir.up);
+//            }
+//
+//            @Override
+//            public void onRight() {
+//                player.moveRight();
+//                player.keepMoving(Player.dir.right);
+//
+//            }
+//
+//            @Override
+//            public void onLeft() {
+//                player.moveLeft();
+//                player.keepMoving(Player.dir.left);
+//            }
+//
+//            @Override
+//            public void onDown() {
+//                player.moveDown();
+//                player.keepMoving(Player.dir.down);
+//            }
+//
+//            @Override
+//            public void onLeftUp() {
+//                player.moveLeftUp();
+//                player.keepMoving(Player.dir.leftup);
+//            }
+//
+//            @Override
+//            public void onLeftDown() {
+//                player.moveLeftDown();
+//                player.keepMoving(Player.dir.leftdown);
+//            }
+//
+//            @Override
+//            public void onRightUp() {
+//                player.moveRightUp();
+//                player.keepMoving(Player.dir.rightup);
+//            }
+//
+//            @Override
+//            public void onRightDown() {
+//                player.moveRightDown();
+//                player.keepMoving(Player.dir.rightdown);
+//            }
+//
+//        });
+//        im.addProcessor(mgd);
         Gdx.input.setInputProcessor(im);
     }
 
@@ -327,6 +389,7 @@ public class PlayState extends State {
         im.addProcessor(stage);
         //Gdx.input.setInputProcessor(stage);
         dialogShowing = false;
+        endDialogShowing = false;
 
         // UI
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -361,6 +424,8 @@ public class PlayState extends State {
                     handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)), true);
                     gsm.set(new ScoreScreenState(gsm));
                 }
+
+                endDialogShowing = false;
             }
         };
 
@@ -404,9 +469,9 @@ public class PlayState extends State {
                 {
                     barrelsAcquired += 1;
                     healthBarVal -= 0.08f * maxHealthLosable;
-                    player.boostPlayer(1.5f);
-                    //if (healthBarVal < 0)
-                    //    healthBarVal = 0;
+                    player.boostPlayer(1.25f);
+                    if (healthBarVal < 0)
+                        healthBarVal = 0;
                     lastBarrelScore = scoreAmount;
                     scoreAnimationStart = TimeUtils.millis();
                     scoreAnimation = true;
@@ -473,28 +538,25 @@ public class PlayState extends State {
         //boolean isMoved = false;
         isTouched = false;
 
-        if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             //logData += "Up";
             player.moveUp();
             inputRegistered += 1;
             isTouched = true;
             //isMoved = true;
-        }
-        else if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
             //logData += "Down";
             player.moveDown();
             inputRegistered += 1;
             isTouched = true;
             //isMoved = true;
-        }
-        else if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             //logData += "Left";
             player.moveLeft();
             inputRegistered += 1;
             isTouched = true;
             //isMoved = true;
-        }
-        else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             //logData += "Right";
             player.moveRight();
             inputRegistered += 1;
@@ -502,33 +564,110 @@ public class PlayState extends State {
             //isMoved = true;
         }
 
-        if(Gdx.input.isTouched())
-        {
+        if (Gdx.input.justTouched()) {
+            System.out.println("just touched");
+            lastTouchedPointX = Gdx.input.getX();
+            lastTouchedPointY = Gdx.input.getY();
+
+            for (int i=0; i<12; i++)
+                direction_filter[i] = 0;
+        } else if (Gdx.input.isTouched()) {
             inputRegistered += 1;
             isTouched = true;
-            //System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
-            int index_row = (int)(11f*(float)Gdx.input.getY() / (float)Gdx.graphics.getHeight());
-            int index_col = (int)(11f*(float)Gdx.input.getX() / (float)Gdx.graphics.getWidth());
-            //System.out.println(index_col+ " " + index_row);
-            if (index_row >= 0 && index_row < 11 && index_col >= 0 && index_col < 11) {
-                if (touchArray[index_row][index_col] == 1) {
-                    player.moveUp();
-                }
 
-                if (touchArray[index_row][index_col] == 2) {
-                    player.moveRight();
-                }
+            int currentTouchedPointX = Gdx.input.getX();
+            int currentTouchedPointY = Gdx.input.getY();
 
-                if (touchArray[index_row][index_col] == 3) {
-                    player.moveDown();
-                }
+            int deltaX = currentTouchedPointX - lastTouchedPointX;
+            int deltaY = currentTouchedPointY - lastTouchedPointY;
 
-                if (touchArray[index_row][index_col] == 4) {
-                    player.moveLeft();
-                }
+            for (int i=1; i<12; i++)
+            {
+                direction_filter[i] = direction_filter[i-1];
             }
 
+
+
+            //if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    System.out.println("changing direction right left");
+                    if (deltaX > 0) {
+                        System.out.println("moving right");
+                        direction_filter[0] = 1;
+
+
+                    } else {
+                        direction_filter[0] = 2;
+
+
+                    }
+
+
+                } else if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    System.out.println("changing direction up down");
+                    if (deltaY > 0) {
+                        direction_filter[0] = 3;
+
+
+                    } else {
+                        direction_filter[0] = 4;
+
+
+                    }
+                }
+
+            int dir = getPopularElement(direction_filter);
+
+            if(dir == 1)
+            {
+                player.moveRight();
+                player.keepMoving(Player.dir.right);
+            } else if (dir == 2)
+            {
+                player.moveLeft();
+                player.keepMoving(Player.dir.left);
+            } else if (dir == 3)
+            {
+                player.moveDown();
+                player.keepMoving(Player.dir.down);
+            } else if (dir == 4)
+            {
+                player.moveUp();
+                player.keepMoving(Player.dir.up);
+            }
+
+
+           // }
+            lastTouchedPointX = currentTouchedPointX;
+            lastTouchedPointY = currentTouchedPointY;
         }
+
+
+//            //System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
+
+//            int index_row = (int)(11f*(float)Gdx.input.getY() / (float)Gdx.graphics.getHeight());
+//            int index_col = (int)(11f*(float)Gdx.input.getX() / (float)Gdx.graphics.getWidth());
+//            //System.out.println(index_col+ " " + index_row);
+//            if (index_row >= 0 && index_row < 11 && index_col >= 0 && index_col < 11) {
+//                if (touchArray[index_row][index_col] == 1) {
+//                    player.moveUp();
+//                }
+//
+//                if (touchArray[index_row][index_col] == 2) {
+//                    player.moveRight();
+//                }
+//
+//                if (touchArray[index_row][index_col] == 3) {
+//                    player.moveDown();
+//                }
+//
+//                if (touchArray[index_row][index_col] == 4) {
+//                    player.moveLeft();
+//                }
+//            }
+//
+
 
         //logData += "\n";
 
@@ -537,6 +676,28 @@ public class PlayState extends State {
 
     }
 
+    public int getPopularElement(int[] a)
+    {
+        int count = 1, tempCount;
+        int popular = a[0];
+        int temp = 0;
+        for (int i = 0; i < (a.length - 1); i++)
+        {
+            temp = a[i];
+            tempCount = 0;
+            for (int j = 1; j < a.length; j++)
+            {
+                if (temp == a[j])
+                    tempCount++;
+            }
+            if (tempCount > count)
+            {
+                popular = temp;
+                count = tempCount;
+            }
+        }
+        return popular;
+    }
 
     private void spawnInitialBarrels()
     {
@@ -861,7 +1022,7 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
-        if (!dialogShowing) {
+        if (!dialogShowing && !endDialogShowing) {
             handleInput();
             player.update(dt);
             if (resumeFlag == true)
@@ -979,14 +1140,15 @@ public class PlayState extends State {
 
 
 
-                Timer.schedule(new Timer.Task() {
-
-                    @Override
-                    public void run() {
-                        endLevelDialog.show(stage);
-                        //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
-                    }
-                }, 2);
+//                Timer.schedule(new Timer.Task() {
+//
+//                    @Override
+//                    public void run() {
+//                        endLevelDialog.show(stage);
+//                        endDialogShowing = true;
+//                        //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
+//                    }
+//                }, 2);
 
             }
         }
@@ -1010,6 +1172,11 @@ public class PlayState extends State {
                 System.out.println("Transitioned back to outside");
                 Vector3 newPosition = new Vector3(5* GRID_UNIT, 1*GRID_UNIT, 0);
                 player.setPosition(newPosition);
+
+                if (levelCounter != 0) {
+                    endLevelDialog.show(stage);
+                    endDialogShowing = true;
+                }
             }
             if (resumeFlag == true)
             {
@@ -1050,7 +1217,7 @@ public class PlayState extends State {
             // Drawing food items
             for (Rectangle foodItem : foodSupplies) {
                 sb.draw(food.getBarrel(), foodItem.x, foodItem.y);
-                sb.draw(food.getFoodTexture(subMaze.occupiedGrid[Math.round(foodItem.y / GRID_UNIT)][Math.round(foodItem.x) / GRID_UNIT]), foodItem.x, foodItem.y);
+                sb.draw(food.getFoodTexture(2), foodItem.x, foodItem.y);
             }
 
             sb.draw(player.getTexture(), player.getPosition().x, player.getPosition().y);
