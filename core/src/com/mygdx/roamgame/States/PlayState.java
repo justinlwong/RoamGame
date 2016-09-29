@@ -108,6 +108,7 @@ public class PlayState extends State {
     private Texture candyShop;
     private Texture dpadCross;
     private Sprite dpadCrossSprite;
+    private Texture redArrowUp;
     Texture fb;
     Texture bb;
     Texture person;
@@ -154,6 +155,18 @@ public class PlayState extends State {
     // Dialog
     Dialog barrelChooseDialog;
     Dialog endLevelDialog;
+
+    //Tutorial Dialogs
+    Dialog tut1Dialog;
+    Dialog tut2Dialog;
+    Dialog tut3Dialog;
+    Dialog tut4Dialog;
+    Dialog tut5Dialog;
+    boolean tut1Complete;
+    boolean tut2Complete;
+    boolean tut3Complete;
+    boolean tut4Complete;
+    boolean tut5Complete;
     Skin skin;
     Stage stage;
     private boolean dialogShowing;
@@ -267,6 +280,7 @@ public class PlayState extends State {
         bb = new Texture("bar_back.png");
         dpadCross = new Texture("transparentDark07.png");
         dpadCrossSprite = createScaledSprite(dpadCross);
+        redArrowUp = new Texture(("redarrow.png"));
 
         // dialog setup
         skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -380,18 +394,156 @@ public class PlayState extends State {
         };
 
         //barrelChooseDialog.setSkin(skin);
-
-
-
         barrelChooseDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
         barrelChooseDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 4);
 
         barrelChooseDialog.button("Points", 1L);
         barrelChooseDialog.button("Health", 2L);
 
-
-
+        setupTutorialDialogues();
     }
+
+    public void setupTutorialDialogues() {
+
+        Window.WindowStyle style = new Window.WindowStyle();
+        style.titleFont = bfont;
+        Gdx.input.setInputProcessor(stage);
+
+        tut1Complete = false;
+        tut2Complete = false;
+        tut3Complete = false;
+        tut4Complete = false;
+        tut5Complete = false;
+
+        tut1Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.25f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut1Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut1Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut1Dialog.button("Press to Continue", 1L);
+        tut1Dialog.text(("Welcome to Roam Game! This is the loading room,\n" +
+        "please walk forward through the exit to begin the game!"));
+
+        tut2Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.25f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut2Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut2Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut2Dialog.button("Press to Continue", 1L);
+        tut2Dialog.text(("Welcome to Roam Game! \n" +
+                "Navigate the maze to find the exit!\n" +
+                "Collect Barrels to gain points!\n" +
+                "Avoid Reapers and Poison Grass!"));
+
+        tut3Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.50f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut3Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut3Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut3Dialog.button("Press to Continue", 1L);
+        tut3Dialog.text(("The Barrels are located in various parts of the submaze! \n" +
+                "Your points will be multiplied for successive barrels that are collected!\n" +
+                "Barrels can also be used for health, but doing so will break the\n" +
+                "multiplicative points factor!"));
+
+        tut4Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.25f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut4Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut4Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut4Dialog.button("Press to Continue", 1L);
+        tut4Dialog.text(("Avoid the Reapers and Poison Grass! \n" +
+                "Collisions with Reapers will greatly reduce health!\n" +
+                "Collisions with Poison Grass will slow speed for a period of time!\n"));
+
+        tut5Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.50f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut5Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut5Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut5Dialog.button("Press to Continue", 1L);
+        tut5Dialog.text(("This is an intermittent room. \n" +
+                "After successfully navigating a sub maze, you will have a choice!\n" +
+                "To continue playing to get a higher score, or quit the game!\n" +
+                "Beware! Barrels are of higher value in successive levels, but the \n" +
+                "perils and threats are greater as well!"));
+
+    } // function
 
     @Override
     public void resume() {
@@ -790,6 +942,7 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
+
         if (!dialogShowing) {
             handleInput();
             player.update(dt);
@@ -889,16 +1042,25 @@ public class PlayState extends State {
 
                 spawnInitialBarrels();
 
-
-
+                int timerVal = 0;
+                if (tut5Complete)
+                    timerVal = 1;
+                else
+                    timerVal = 8;
                 Timer.schedule(new Timer.Task() {
-
                     @Override
                     public void run() {
                         endLevelDialog.show(stage);
                         //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
                     }
-                }, 2);
+                }, timerVal);
+
+                if (!tut5Complete) {
+                    tut5Dialog.show(stage);
+                    tut5Complete = true;
+                }
+
+
 
             }
         }
@@ -918,6 +1080,10 @@ public class PlayState extends State {
             //sb.setProjectionMatrix(cam.combined);
             sb.begin();
 
+            if (!tut2Complete) {
+                sb.draw(redArrowUp, startRoom.getExitRectangle().getX() - 30, startRoom.getExitRectangle().getY() - 50, 100, 100);
+            }
+
             if (transitionFrame == true) {
                 System.out.println("Transitioned back to outside");
                 Vector3 newPosition = new Vector3(5* GRID_UNIT, 1*GRID_UNIT, 0);
@@ -925,7 +1091,6 @@ public class PlayState extends State {
             }
 
             sb.draw(player.getTexture(), player.getPosition().x, player.getPosition().y);
-
 
             sb.end();
             transitionFrame = false;
@@ -936,9 +1101,14 @@ public class PlayState extends State {
 
             sb.setProjectionMatrix(cam.combined);
             sb.begin();
+
+            if (!tut5Complete) {
+                sb.draw(redArrowUp, subMaze.getExitRectangle().getX() - 20, subMaze.getExitRectangle().getY() - 50, 100, 100);
+            }
+
             if (transitionFrame == true) {
                 System.out.println("Transitioned");
-                Vector3 newPosition = new Vector3(10 * GRID_UNIT, 1*GRID_UNIT, 0);
+                Vector3 newPosition = new Vector3(10 * GRID_UNIT, 1 * GRID_UNIT, 0);
                 player.setPosition(newPosition);
             }
 
@@ -962,8 +1132,32 @@ public class PlayState extends State {
             sb.end();
             transitionFrame = false;
 
-        }
+            if (!tut2Complete) {
+                tut2Dialog.show(stage);
+                tut2Complete = true;
+                dialogShowing = true;
 
+                int timerVal = 10;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        tut3Dialog.show(stage);
+                        tut3Complete = true;
+                        dialogShowing = true;
+                        //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
+                    }
+                }, timerVal);
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        tut4Dialog.show(stage);
+                        tut4Complete = true;
+                        dialogShowing = true;
+                        //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
+                    }
+                }, timerVal*2);
+            }
+        }
     }
 
     // Render Game Info
@@ -992,16 +1186,13 @@ public class PlayState extends State {
 
         Label.LabelStyle textStyle;
         Label text;
-
         textStyle = new Label.LabelStyle();
         textStyle.font = font;
-
         text = new Label("Score : " + String.valueOf(score), textStyle);
         float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
         //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
         text.setFontScale(screenScale, screenScale);
         text.setPosition(positionScore.x, positionScore.y);
-
         text.draw(hb, 2f);
 
         Label textTolerance;
@@ -1035,6 +1226,12 @@ public class PlayState extends State {
         }
 
         if (levelAnimation) {
+            //show second tutorial
+            /*if(firstTutorial) {
+                entranceDialog.show(stage);
+                dialogShowing = true;
+                firstTutorial = false;
+            }*/
 
             float alpha = (1f - ((float)(TimeUtils.millis() - 500 - levelAnimationStart)/2500f));
             if ((TimeUtils.millis() - levelAnimationStart > 500) ) {
@@ -1060,6 +1257,15 @@ public class PlayState extends State {
             }
         }
 
+        if (!tut1Complete) {
+            //cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
+            tut1Dialog.show(stage);
+            //hb.draw(redArrowUp, startRoom.getExitRectangle().getX() - 30, startRoom.getExitRectangle().getY() - 50, 100, 100);
+            //tut1Dialog.setPosition(0, 0);
+            //dialogShowing = true;
+            tut1Complete = true;
+            //hb.draw(redArrowUp, startRoom.getExitRectangle().getX()-30, startRoom.getExitRectangle().getY()-50, 100, 100);
+        }
 //        textTolerance = new Label("Current Health: " + String.valueOf((int)(100*(1 - (healthBarVal/maxHealthLosable)))) , textStyle);
         textTolerance = new Label("Level Score: " + String.valueOf(levelScore) , textStyle);
         //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
@@ -1094,7 +1300,6 @@ public class PlayState extends State {
 
         //hb.draw(dpadCrossSprite, dPadPosition.x, dPadPosition.y);
         //hb.setColor(c.r, c.g, c.b, 1f);
-
         hb.end();
 
         // draw blood screen
@@ -1123,6 +1328,13 @@ public class PlayState extends State {
 
         stage.act();
         stage.draw();
+
+        /*ShapeRenderer sr;
+        sr = new ShapeRenderer();
+        sr.begin(ShapeRenderer.ShapeType.Line);
+        sr.setColor(1, 0, 0, 0);
+        sr.rect(5, 5, 100, 100);
+        sr.end();*/
     }
 
 //    private void spawnFood() {
