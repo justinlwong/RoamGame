@@ -84,7 +84,7 @@ public class Player {
 
         loadTextures(person, goo);
 
-        bounds = new Rectangle(x+5, y+5, texture.getWidth()/6, texture.getHeight()/12);
+        bounds = new Rectangle(x+3, y+3, texture.getWidth()/6, texture.getHeight()/12);
         curDir = dir.up;
         curspeedmax = speedmax;
         curdiagspeedmax = diagspeedmax;

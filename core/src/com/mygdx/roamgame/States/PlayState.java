@@ -353,7 +353,7 @@ public class PlayState extends State {
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
         // camera related info
-        cam.setToOrtho(false, RoamGame.WIDTH, RoamGame.HEIGHT);
+        cam.setToOrtho(false, RoamGame.WIDTH*3/4, RoamGame.HEIGHT*3/4);
 
         // game features / interactables
         person = new Texture("steverogers.png");
