@@ -50,7 +50,7 @@ public class Player {
     private boolean isSlowed;
     private boolean isBoosted;
 
-    static float speedmax = 360f;
+    static float speedmax = 300f;
 
     static float slowDamping = 0.98f;
 
@@ -65,6 +65,7 @@ public class Player {
     private long maxSlowedTime = 4000;
     private long startChangeSpeedTime;
     private float boostfactor;
+    private boolean resumeFlag = false;
 
 
     public Player(int x, int y, int height, int width, Texture person, Texture goo)
@@ -80,20 +81,24 @@ public class Player {
         isSlowed = false;
 
         st = state.standby;
-        texture = person;
-        gooTexture = goo;
-        walkAnimation = new PlayerAnimation(new TextureRegion(texture), 4, 1.0f);
-        gooWalkAnimation =  new PlayerAnimation(new TextureRegion(gooTexture), 4, 2.0f);
+
+        loadTextures(person, goo);
+
         bounds = new Rectangle(x+5, y+5, texture.getWidth()/6, texture.getHeight()/12);
         curDir = dir.up;
         curspeedmax = speedmax;
         curdiagspeedmax = diagspeedmax;
     }
 
-    public void resume()
+    public void loadTextures(Texture person, Texture goo)
     {
+        Gdx.app.log("resume", "reloading textures");
+        texture = person;
+        gooTexture = goo;
         walkAnimation = new PlayerAnimation(new TextureRegion(texture), 4, 1.0f);
         gooWalkAnimation =  new PlayerAnimation(new TextureRegion(gooTexture), 4, 2.0f);
+        Gdx.app.log("resume", "finished loading");
+        resumeFlag = true;
     }
 
     public void keepMoving(dir d)
@@ -103,7 +108,7 @@ public class Player {
 
     public void slowPlayer ()
     {
-        if (isSlowed == false && isBoosted != true) {
+        if (isSlowed == false){// && isBoosted != true) {
             Gdx.input.vibrate(new long [] {0, 400, 200, 400}, -1);
             isSlowed = true;
             startChangeSpeedTime = TimeUtils.millis();
@@ -124,6 +129,27 @@ public class Player {
     public float getSpeedSum(){return Math.abs(speed.x) + Math.abs(speed.y);}
 
     public void update (float dt) {
+        // check if keep moving flag is on
+        if ((Gdx.input.isTouched() == true )&& (st == st.walking))
+        {
+            if (curDir  == dir.down)
+                moveDown();
+            else if (curDir  == dir.up)
+                moveUp();
+            else if (curDir  == dir.right)
+                moveRight();
+            else if (curDir  == dir.left)
+                moveLeft();
+//            else if (curDir  == dir.leftdown)
+//                moveLeftDown();
+//            else if (curDir  == dir.leftup)
+//                moveLeftUp();
+//            else if (curDir  == dir.rightdown)
+//                moveRightDown();
+//            else if (curDir  == dir.rightup)
+//                moveRightUp();
+
+        }
         if (isBoosted)
         {
             curspeedmax = speedmax*boostfactor;
@@ -191,8 +217,16 @@ public class Player {
         if (position.y < 0)
             position.y = 0;
 
-        if (position.y > (gameHeight - getTexture().getRegionHeight()))
-            position.y = gameHeight - getTexture().getRegionHeight();
+        if (position.y > (gameHeight))// - getTexture().getRegionHeight()))
+            position.y = gameHeight;// - getTexture().getRegionHeight();
+
+        if (resumeFlag == true)
+        {
+            Gdx.app.log("resumed", "updated first time position " + position.x + " " + position.y);
+            resumeFlag = false;
+        }
+
+        //Gdx.app.log("position ",  position.x + " " + position.y);
     }
 
     public void setPosition (Vector3 newPosition)
@@ -307,7 +341,8 @@ public class Player {
 
     public void dispose()
     {
-        //texture.dispose();
-        //gooTexture.dispose();
+        texture.dispose();
+        gooTexture.dispose();
+
     }
 }

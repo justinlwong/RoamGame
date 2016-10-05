@@ -50,6 +50,11 @@ public class MenuState extends State {
     }
 
     @Override
+    public void pause() {
+
+    }
+
+    @Override
     public void resume() {
 
     }

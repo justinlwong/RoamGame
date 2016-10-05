@@ -89,6 +89,7 @@ public class RoamGame extends ApplicationAdapter  {
 	@Override
 	public void pause()
 	{
+		gsm.pause();
 		this.state = AppState.PAUSE;
 	}
 

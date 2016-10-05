@@ -49,7 +49,7 @@ public class Zombie {
         zombieAnimation = new ZombieAnimation(new TextureRegion(zombie), 4, 1.0f);
         bounds = new Rectangle(x, y, zombie.getWidth()/4, zombie.getHeight()/4);
         direction = dir;
-        boink = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
+        boink = Gdx.audio.newSound(Gdx.files.internal("impact.wav"));
 
 
     }

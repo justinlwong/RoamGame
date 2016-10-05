@@ -110,7 +110,7 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
 
     public String getUserName ()
     {
-        String userName = null;
+        String userName = "John Doe";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor resultSet = db.rawQuery("Select * From " + TABLE_PROFILES, null);
         resultSet.moveToLast();

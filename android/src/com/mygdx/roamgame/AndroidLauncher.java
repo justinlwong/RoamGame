@@ -82,8 +82,11 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
 
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+
+
 		//RoamGame instance = new RoamGame();
 		initialize(new RoamGame(), config);
+
 		//new loadApiAsyncTask().execute(new Pair<Context, String>(this, "Justin"));
 
 	}

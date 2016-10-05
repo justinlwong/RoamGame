@@ -24,6 +24,7 @@ public abstract class State {
     public abstract void update(float dt);
     public abstract void render(SpriteBatch sb, SpriteBatch hb);
     public abstract void dispose();
+    public abstract void pause();
     public abstract void resume();
 
 }

@@ -85,7 +85,7 @@ public class Environment {
         // special rectangle for exit area
         exitRectangle = new Rectangle();
         exitRectangle.x = gridUnit *exitX;
-        exitRectangle.y = gridUnit *exitY;
+        exitRectangle.y = gridUnit *(exitY + 0.5f);
         exitRectangle.width = exitWidth* gridUnit;
         exitRectangle.height = gridUnit;
 
