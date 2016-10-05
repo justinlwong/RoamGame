@@ -420,7 +420,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.25f*Gdx.graphics.getHeight();
+                return 0.45f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -609,7 +609,11 @@ public class PlayState extends State {
             protected void result(Object object) {
 
                 int selected = Integer.parseInt(object.toString());
+                tut3Complete = true;
                 dialogShowing = false;
+
+                barrelChooseDialog.show(stage);
+                dialogShowing = true;
             }
         };
         tut3Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
@@ -931,18 +935,8 @@ public class PlayState extends State {
             if (item.overlaps(player.getBounds())) {
                 if (!tut3Complete) {
                     tut3Dialog.show(stage);
-                    tut3Complete = true;
+                    //tut3Complete = true;
                     dialogShowing = true;
-
-                    int timerVal = 6;
-                    Timer.schedule(new Timer.Task() {
-                        @Override
-                        public void run() {
-                            barrelChooseDialog.show(stage);
-                            dialogShowing = true;
-                            //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
-                        }
-                    }, timerVal);
                 } else {
                     barrelChooseDialog.show(stage);
                     dialogShowing = true;
@@ -1172,7 +1166,7 @@ public class PlayState extends State {
                 heartBeatSound.setLooping(true);
                 heartBeatSound.play();
             }
-            float volume =  10*((float)healthBarVal /maxHealthLosable - 0.5f);
+            float volume =  100*((float)healthBarVal /maxHealthLosable);
             heartBeatSound.setVolume(volume);
         } else
         {
@@ -1361,15 +1355,16 @@ public class PlayState extends State {
                 player.setPosition(newPosition);
 
                 if (levelCounter != 0) {
-                    int timerVal = 1;
+                    /*int timerVal = 1;
                     Timer.schedule(new Timer.Task() {
                         @Override
                         public void run() {
                             endLevelDialog.show(stage);
                             //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
                         }
-                    }, timerVal);
+                    }, timerVal);*/
                     //endLevelDialog.show(stage);
+                    endLevelDialog.show(stage);
                     endDialogShowing = true;
                 }
             }
@@ -1728,6 +1723,7 @@ public class PlayState extends State {
         heartBeatSound.dispose();
         person.dispose();
         gooTexture.dispose();
+        redArrowUp.dispose();
     }
 
 }
