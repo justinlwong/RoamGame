@@ -137,6 +137,7 @@ public class PlayState extends State {
     private Sound pickupItemSound;
     private Sound deathSound;
     private Music heartBeatSound;
+    private float pitch = 1f;
 
     // Fonts
     BitmapFont font;
@@ -482,6 +483,8 @@ public class PlayState extends State {
 
                 if (selected == 1)
                 {
+
+                    //pickupItemSound.setPitch(pickupItemSound.play(),pitch);
                     barrelStreak += 1;
                     levelBarrelStreak += 1;
                     healthBarVal -= 0.08f * maxHealthLosable;
@@ -492,11 +495,16 @@ public class PlayState extends State {
                     scoreAnimationStart = TimeUtils.millis();
                     scoreAnimation = true;
                     // Play sound
-                    pickupItemSound.play(0.5f);
+                    //System.out.println(pitch);
+                    pickupItemSound.play(0.5f, pitch, 0);
+                    pitch *= 1.1f;
+                    if (pitch > 2f)
+                        pitch = 2f;
                     levelScore += scoreAmount* barrelStreak;
                 } else if (selected == 2)
                 {
                     barrelStreak = 0;
+                    pitch = 1f;
                     levelBarrelStreak = 0;
                     lastHealthAdded = 4*baseScore;
                     healthBarVal -= lastHealthAdded;
@@ -1296,8 +1304,10 @@ public class PlayState extends State {
 
                 lastLevelScore = levelScore;
                 levelScore = 0;
-                if (levelBarrelStreak !=4)
+                if (levelBarrelStreak !=4) {
                     barrelStreak = 0;
+                    pitch = 1f;
+                }
                 levelBarrelStreak = 0;
                 //barrelStreak = 0;
 
