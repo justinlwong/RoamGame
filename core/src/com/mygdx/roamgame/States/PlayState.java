@@ -27,8 +27,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
-import com.mygdx.roamgame.MovementGestureDetector;
 import com.mygdx.roamgame.RoamGame;
 import com.mygdx.roamgame.sprites.Environment;
 import com.mygdx.roamgame.sprites.Food;
@@ -199,7 +197,7 @@ public class PlayState extends State {
     FileHandle handle;
 
     private boolean resumeFlag= false;
-    private int barrelsAcquired;
+    private int barrelStreak;
     private int lastLevelScore;
     private Sound splashSound;
 
@@ -251,8 +249,6 @@ public class PlayState extends State {
 
     protected PlayState(final GameStateManager gsm) {
         super(gsm);
-
-
 
         // file
         handle = Gdx.files.local("gameInfoLog.txt");
@@ -485,7 +481,7 @@ public class PlayState extends State {
 
                 if (selected == 1)
                 {
-                    barrelsAcquired += 1;
+                    barrelStreak += 1;
                     healthBarVal -= 0.08f * maxHealthLosable;
                     player.boostPlayer(1.25f);
                     if (healthBarVal < 0)
@@ -495,9 +491,10 @@ public class PlayState extends State {
                     scoreAnimation = true;
                     // Play sound
                     pickupItemSound.play(0.5f);
-                    levelScore += scoreAmount*barrelsAcquired;
+                    levelScore += scoreAmount* barrelStreak;
                 } else if (selected == 2)
                 {
+                    barrelStreak = 0;
                     lastHealthAdded = 4*baseScore;
                     healthBarVal -= lastHealthAdded;
                     //player.boostPlayer(1.5f);
@@ -1293,7 +1290,7 @@ public class PlayState extends State {
 
                 lastLevelScore = levelScore;
                 levelScore = 0;
-                barrelsAcquired = 0;
+                //barrelStreak = 0;
 
                 endLevelAnimation = true;
                 endLevelAnimationStart = TimeUtils.millis();
@@ -1481,16 +1478,16 @@ public class PlayState extends State {
 
         }
         if (scoreAnimation) {
-            String suffix = "th";
+            //String suffix = "th";
             float alpha = (1f - ((float)(TimeUtils.millis() - scoreAnimationStart)/5000f));
-            if (barrelsAcquired == 1)
-                suffix = "st";
-            else if (barrelsAcquired == 2)
-                suffix = "nd";
-            else if (barrelsAcquired == 3)
-                suffix = "rd";
+//            if (barrelStreak == 1)
+//                suffix = "st";
+//            else if (barrelStreak == 2)
+//                suffix = "nd";
+//            else if (barrelStreak == 3)
+//                suffix = "rd";
             bfont.setColor(new Color(255, 255, 0, alpha));
-            bfont.draw(hb, "+   " +barrelsAcquired+ suffix+"   barrel * "+lastBarrelScore + "   =   " + barrelsAcquired*lastBarrelScore+ "   points!", Gdx.graphics.getWidth() / 8, Gdx.graphics.getHeight() / 2);
+            bfont.draw(hb, "+   " + barrelStreak + "-Streak * "+lastBarrelScore + "   =   " + barrelStreak *lastBarrelScore+ "   points!", Gdx.graphics.getWidth() / 8, Gdx.graphics.getHeight() / 2);
             if (TimeUtils.millis() - scoreAnimationStart > 5000 )
             {
                 scoreAnimation = false;
@@ -1547,6 +1544,7 @@ public class PlayState extends State {
 
         }
 //        textTolerance = new Label("Current Health: " + String.valueOf((int)(100*(1 - (healthBarVal/maxHealthLosable)))) , textStyle);
+
         textTolerance = new Label("Level " + String.valueOf(levelCounter+1) + " Score: " + String.valueOf(levelScore) , textStyle);
         //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
         textTolerance.setFontScale(screenScale, screenScale);
@@ -1554,6 +1552,12 @@ public class PlayState extends State {
 
         textTolerance.draw(hb, 2f);
 
+        textTolerance = new Label("Streak: " + String.valueOf(barrelStreak) , textStyle);
+        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
+        textTolerance.setFontScale(screenScale, screenScale);
+        textTolerance.setPosition(positionScore.x, positionScore.y - 0.06f * Gdx.graphics.getHeight());
+
+        textTolerance.draw(hb, 2f);
 
         if (resumeFlag == true)
         {
