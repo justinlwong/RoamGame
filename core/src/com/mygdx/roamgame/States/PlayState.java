@@ -1168,10 +1168,13 @@ public class PlayState extends State {
             }
             float volume =  100*((float)healthBarVal /maxHealthLosable);
             heartBeatSound.setVolume(volume);
+            music.pause();
         } else
         {
-            if(heartBeatSound.isPlaying())
+            if(heartBeatSound.isPlaying()) {
                 heartBeatSound.pause();
+                music.play();
+            }
         }
         //System.out.println(realTimeTolerance);
 
