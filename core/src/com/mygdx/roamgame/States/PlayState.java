@@ -198,6 +198,7 @@ public class PlayState extends State {
 
     private boolean resumeFlag= false;
     private int barrelStreak;
+    private int levelBarrelStreak = 0;
     private int lastLevelScore;
     private Sound splashSound;
 
@@ -482,6 +483,7 @@ public class PlayState extends State {
                 if (selected == 1)
                 {
                     barrelStreak += 1;
+                    levelBarrelStreak += 1;
                     healthBarVal -= 0.08f * maxHealthLosable;
                     player.boostPlayer(1.25f);
                     if (healthBarVal < 0)
@@ -495,6 +497,7 @@ public class PlayState extends State {
                 } else if (selected == 2)
                 {
                     barrelStreak = 0;
+                    levelBarrelStreak = 0;
                     lastHealthAdded = 4*baseScore;
                     healthBarVal -= lastHealthAdded;
                     //player.boostPlayer(1.5f);
@@ -1290,6 +1293,9 @@ public class PlayState extends State {
 
                 lastLevelScore = levelScore;
                 levelScore = 0;
+                if (levelBarrelStreak !=4)
+                    barrelStreak = 0;
+                levelBarrelStreak = 0;
                 //barrelStreak = 0;
 
                 endLevelAnimation = true;
