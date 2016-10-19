@@ -21,7 +21,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -122,6 +124,7 @@ public class PlayState extends State {
     Texture buttonTexture;
     Texture invincibleButton;
     Texture questionMarkSmall;
+    Texture xscreen;
 
     float diffX = 0;
     float diffY = 0;
@@ -290,6 +293,7 @@ public class PlayState extends State {
 
         person = new Texture("steverogers.png");
         gooTexture = new Texture ("steverogers_goo.png");
+        xscreen = new Texture ("xscreen.png");
         player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
 
         buttonTexture = new Texture("questionbox.png");
@@ -432,7 +436,7 @@ public class PlayState extends State {
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         srender = new ShapeRenderer();
 
-        endLevelDialog = new Dialog("Finished Level!", skin)
+        endLevelDialog = new Dialog(" ", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -443,7 +447,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.45f*Gdx.graphics.getHeight();
+                return 0.40f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -471,10 +475,11 @@ public class PlayState extends State {
         endLevelDialog.button("Continue at\nyour own peril", 1L);
 
         endLevelDialog.button("Cash out!", 2L);
-        endLevelDialog.text(("Congrats on successfully navigating the submaze!\n" +
+        endLevelDialog.setBackground(new Image(xscreen).getDrawable());
+        /*endLevelDialog.text(("Congrats on successfully navigating the submaze!\n" +
                 "Continue playing to get a higher score, or quit the game!\n" +
                 "Beware! Barrels are of higher value in successive levels, but the \n" +
-                "perils and threats are greater as well!"));
+                "perils and threats are greater as well!"));*/
 
         Window.WindowStyle style = new Window.WindowStyle();
         style.titleFont = bfont;
@@ -1886,6 +1891,7 @@ public class PlayState extends State {
         person.dispose();
         gooTexture.dispose();
         redArrowUp.dispose();
+        xscreen.dispose();
     }
 
 }
