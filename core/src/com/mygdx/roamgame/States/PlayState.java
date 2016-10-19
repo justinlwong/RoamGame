@@ -27,7 +27,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 import com.mygdx.roamgame.RoamGame;
+import com.mygdx.roamgame.sprites.AbilityButton;
 import com.mygdx.roamgame.sprites.Environment;
 import com.mygdx.roamgame.sprites.Food;
 import com.mygdx.roamgame.sprites.Player;
@@ -95,6 +97,7 @@ public class PlayState extends State {
     // game features / interactles
     private Player player;
     private Array<Rectangle> foodSupplies;
+    private Array<Rectangle> abilityBoxes;
     private Food food;
     private Array<PoisonObject> redPoisonArr;
     private long lastRedPoisonSpawnTime;
@@ -103,6 +106,7 @@ public class PlayState extends State {
     private Zombie zombie;
     public static final int MAX_ZOMBIES = 16;
     private Array<Rectangle> zombiesBounds;
+    private boolean abilityBoxPickedUp = false;
 
     // Textures
     AssetManager manager = new AssetManager();
@@ -114,6 +118,10 @@ public class PlayState extends State {
     Texture bb;
     Texture person;
     Texture gooTexture;
+    AbilityButton abilityButton;
+    Texture buttonTexture;
+    Texture invincibleButton;
+    Texture questionMarkSmall;
 
     float diffX = 0;
     float diffY = 0;
@@ -137,6 +145,8 @@ public class PlayState extends State {
     private Sound pickupItemSound;
     private Sound deathSound;
     private Music heartBeatSound;
+    private Sound pickupAbilitySound;
+    private Music invincibilityMusic;
     private float pitch = 1f;
 
     // Fonts
@@ -182,6 +192,12 @@ public class PlayState extends State {
     ShapeRenderer srender;
     Rectangle bloodScreen;
 
+    // Abilities
+    private boolean invincibleMode = false;
+    private boolean abilityActive = false;
+    private float abilityBox_X;
+    private float abilityBox_Y;
+
     int [][]touchArray = new int[][]
             {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                     {4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2},
@@ -197,11 +213,12 @@ public class PlayState extends State {
     // File
     FileHandle handle;
 
-    private boolean resumeFlag= false;
+    private boolean resumeFlag = false;
     private int barrelStreak;
     private int levelBarrelStreak = 0;
     private int lastLevelScore;
     private Sound splashSound;
+
 
     public class PoisonObject
     {
@@ -275,11 +292,17 @@ public class PlayState extends State {
         gooTexture = new Texture ("steverogers_goo.png");
         player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
 
+        buttonTexture = new Texture("questionbox.png");
+        invincibleButton = new Texture("invincible.png");
+        abilityButton = new AbilityButton(buttonTexture);
+        questionMarkSmall = new Texture("questionbox_small.png");
+
         initTextures();
 
         zombiesBounds = new Array<Rectangle>();
         redPoisonArr = new Array<PoisonObject>();
         foodSupplies = new Array<Rectangle>();
+        abilityBoxes = new Array<Rectangle>();
 
         spawnInitialBarrels();
 //        MovementGestureDetector mgd = new MovementGestureDetector(new MovementGestureDetector.DirectionListener() {
@@ -381,6 +404,8 @@ public class PlayState extends State {
         music.setVolume(0.1f);
         music.play();
         pickupItemSound = Gdx.audio.newSound(Gdx.files.internal("pickupSound.mp3"));
+        pickupAbilitySound = Gdx.audio.newSound(Gdx.files.internal("abilityBox.mp3"));
+        invincibilityMusic = Gdx.audio.newMusic(Gdx.files.internal("invincible.wav"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
         splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
         heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
@@ -517,6 +542,22 @@ public class PlayState extends State {
                     pickupItemSound.play(0.5f);
                 }
 
+                // chance of ability box
+
+                int num = MathUtils.random(0, 3);
+                System.out.println("num: " + num);
+                if (num == 0) {
+                    Timer.schedule(new Timer.Task() {
+
+                        @Override
+                        public void run() {
+                            spawnAbilityBox(abilityBox_X, abilityBox_Y);
+
+                            //endLevelDialog.setSize(0.8f * (float) Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3);
+                        }
+                    }, 1);
+                }
+
                 dialogShowing = false;
 
 
@@ -524,7 +565,6 @@ public class PlayState extends State {
         };
 
         //barrelChooseDialog.setSkin(skin);
-
 
 
         barrelChooseDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
@@ -934,6 +974,33 @@ public class PlayState extends State {
         }
     }
 
+    private void updateAbilityBoxes(float dt)
+    {
+        // Check if player picked up ability boxes
+        for (int index=0; index<abilityBoxes.size; index++)
+        {
+            Rectangle item = abilityBoxes.get(index);
+            if (item.overlaps(player.getBounds())) {
+
+
+                // health boost for high value
+                //if (occupiedSubMazeGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] == 2) {
+                //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
+                // Clear item
+                subMaze.occupiedGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] = -1;
+                if (abilityActive != true) {
+                    abilityBoxPickedUp = true;
+                    abilityButton.setTexture(buttonTexture);
+                    pickupAbilitySound.play(0.5f);
+                }
+
+                abilityBoxes.removeIndex(index);
+
+
+            }
+        }
+    }
+
     private void updateFood(float dt)
     {
         // Check if player picked up food
@@ -941,12 +1008,20 @@ public class PlayState extends State {
         {
             Rectangle item = foodSupplies.get(index);
             if (item.overlaps(player.getBounds())) {
+
+                abilityBox_X = foodSupplies.get(index).getX();
+                abilityBox_Y = foodSupplies.get(index).getY();
+
                 if (!tut3Complete) {
                     tut3Dialog.show(stage);
                     //tut3Complete = true;
                     dialogShowing = true;
                 } else {
+                    // A chance to get a question mark barrel replacing location of food barrel
+                    float x = foodSupplies.get(index).getX();
+                    float y = foodSupplies.get(index).getY();
                     barrelChooseDialog.show(stage);
+
                     dialogShowing = true;
                 }
 
@@ -956,6 +1031,7 @@ public class PlayState extends State {
                 //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
                 // Clear item
                 subMaze.occupiedGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] = -1;
+
                 foodSupplies.removeIndex(index);
 
 
@@ -968,6 +1044,18 @@ public class PlayState extends State {
         //}
     }
 
+    public void spawnAbilityBox(float x, float y)
+    {
+        Rectangle box = new Rectangle();
+
+        box.x = x;
+        box.y = y;
+        box.width = GRID_UNIT;
+        box.height = GRID_UNIT;
+
+        abilityBoxes.add(box);
+    }
+
     private void updateRedPoison(float dt)
     {
         // Check if player hit poison
@@ -975,7 +1063,7 @@ public class PlayState extends State {
         {
 
             Rectangle item = redPoisonArr.get(index).rect;
-            if (item.overlaps(player.getBounds()) && (TimeUtils.millis() - lastPoisonedTime) > 2*SEC) {
+            if (invincibleMode == false && item.overlaps(player.getBounds()) && (TimeUtils.millis() - lastPoisonedTime) > 2*SEC) {
                 splashSound.play(0.7f);
                 healthBarVal+=5;
                 player.slowPlayer();
@@ -1071,7 +1159,7 @@ public class PlayState extends State {
 
             zombies.set(i, zombie);
             if(zombie.getBounds().overlaps(player.getBounds())) {
-                if ((TimeUtils.millis() - lastHitTime) > (int)(0.5f*(float)SEC)) {
+                if ((invincibleMode == false) &&(TimeUtils.millis() - lastHitTime) > (int)(0.5f*(float)SEC)) {
                     healthBarVal+=20;
                     zombie.playSound();
                     lastHitTime = TimeUtils.millis();
@@ -1233,6 +1321,7 @@ public class PlayState extends State {
 
             } else if (location == 1) {
                 updateFood(dt);
+                updateAbilityBoxes(dt);
                 updateHazards(dt);
                 updateRedPoison(dt);
                 //updateSubMazeZombie(dt);
@@ -1321,6 +1410,7 @@ public class PlayState extends State {
                 subMaze = new Environment("roguelike-pack/Map/submaze_" + String.valueOf(levelCounter % 7) + ".tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
 
                 foodSupplies = new Array<Rectangle>();
+                abilityBoxes = new Array<Rectangle>();
                 redPoisonArr = new Array<PoisonObject>();
                 zombiesBounds = new Array<Rectangle>();
                 lastHitTime = 0;
@@ -1429,6 +1519,11 @@ public class PlayState extends State {
             for (Rectangle foodItem : foodSupplies) {
                 sb.draw(food.getBarrel(), foodItem.x, foodItem.y);
                 sb.draw(food.getFoodTexture(2), foodItem.x, foodItem.y);
+            }
+
+            // Drawing ability boxes
+            for (Rectangle abilityItem : abilityBoxes) {
+                sb.draw(questionMarkSmall, abilityItem.x, abilityItem.y);
             }
 
             sb.draw(player.getTexture(), player.getPosition().x, player.getPosition().y);
@@ -1610,6 +1705,24 @@ public class PlayState extends State {
         //hb.draw(dpadCrossSprite, dPadPosition.x, dPadPosition.y);
         //hb.setColor(c.r, c.g, c.b, 1f);
 
+        if (abilityBoxPickedUp) {
+            abilityButton.update(hb);
+            if (Gdx.input.isTouched()) {
+                if ((abilityActive == false) && abilityButton.checkIfClicked(lastTouchedPointX, Gdx.graphics.getHeight() - lastTouchedPointY))
+                {
+                    abilityActive = true;
+                    // choose an ability randomly
+                    int mode = 0;
+
+                    if (mode == 0) {
+                        setInvincibilityMode();
+
+                    }
+                }
+            }
+
+        }
+
         hb.end();
 
         // draw blood screen
@@ -1628,6 +1741,32 @@ public class PlayState extends State {
 
         }
 
+
+
+    }
+
+    public void setInvincibilityMode()
+    {
+        abilityButton.setTexture(invincibleButton);
+
+        // reaper  hits won't hit
+        player.boostPlayer(1.5f);
+        invincibilityMusic.setLooping(true);
+        invincibilityMusic.play();
+        invincibleMode = true;
+
+        // last for 5 seconds
+        Timer.schedule(new Timer.Task() {
+
+                    @Override
+                    public void run() {
+                        abilityBoxPickedUp = false;
+                        abilityActive = false;
+                        invincibleMode = false;
+                        invincibilityMusic.stop();
+
+                    }
+                }, 5);
     }
 
     @Override
