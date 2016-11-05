@@ -12,6 +12,8 @@ import com.google.api.server.spi.config.ApiNamespace;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import static com.mygdx.roamgame.backend.OfyService.ofy;
@@ -50,10 +52,10 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "uploadGameData")
-    public void uploadGameData(@Named("gameID") int gameID, @Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency) {
+    public void uploadGameData(@Named("gameID") int gameID, @Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency, @Named("timestamp") String timestamp) {
         //MyBean response = new MyBean();
 
-        GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency);
+        GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency, timestamp);
         // save to datastore
         ofy().save().entity(gInfo).now();
 
@@ -73,6 +75,19 @@ public class MyEndpoint {
 
 
         //return response;
+    }
+
+    @ApiMethod(name = "getScores")
+    public void getScores(@Named("userName") String userName)
+    {
+        Query<GameInfoData> gInfo = ofy().load().type(GameInfoData.class).filter("user", userName);
+
+        //String res = gInfo.first().toString();
+
+        //return res;
+
+
+
     }
 
 }

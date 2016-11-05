@@ -8,14 +8,9 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.mygdx.roamgame.backend.myApi.MyApi;
-
-import java.io.IOException;
 
 public class MenuActivity extends Activity {
 
@@ -57,6 +52,15 @@ public class MenuActivity extends Activity {
             public void onClick(View v) {
                 Intent userProfileIntent = new Intent(context, UserProfileActivity.class);
                 startActivity(userProfileIntent);
+            }
+        });
+
+        Button scoresButton = (Button)findViewById(R.id.scoreScreenButton);
+        scoresButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent scoresIntent = new Intent(context, ScoreScreenActivity.class);
+                startActivity(scoresIntent);
             }
         });
 

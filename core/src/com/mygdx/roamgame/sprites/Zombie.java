@@ -29,6 +29,7 @@ public class Zombie {
 
     private float speedmax = 90f;
     private boolean turboOn = false;
+    private boolean freezeOn = false;
     private int direction;
     private Sound boink;
 
@@ -59,7 +60,10 @@ public class Zombie {
     }
 
     public void setDirection(int dir) {
-        direction = dir;
+        if (!freezeOn)
+        {
+            direction = dir;
+        }
     }
 
     public void setPosition(float x, float y) {
@@ -76,7 +80,9 @@ public class Zombie {
         position.add(speed);
         speed.scl(1 / dt);
 
-        zombieAnimation.update(dt);
+        if (!freezeOn) {
+            zombieAnimation.update(dt);
+        }
         bounds.setPosition(position.x, position.y);
     }
 
@@ -84,8 +90,12 @@ public class Zombie {
     {
         float speedChosen = speedmax;
 
-        if (turboOn)
-            speedChosen  = 2*speedmax;
+        if (turboOn) {
+            speedChosen = 2 * speedmax;
+        }
+        if (freezeOn) {
+            speedChosen = 0;
+        }
         if(dir == PlayState.UP) { // UP
             speed.x = 0;
             speed.y = speedChosen;
@@ -124,6 +134,8 @@ public class Zombie {
     {
         turboOn = tOn;
     }
+
+    public void setFreezeOn(boolean fOn) { freezeOn = fOn;}
 
     public Rectangle getBounds() {
         return bounds;

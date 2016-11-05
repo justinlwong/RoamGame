@@ -34,8 +34,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".UserProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ScoreScreenActivity"
+            android:label="RoamGame"
             android:screenOrientation="portrait" />
         <activity
             android:name=".GAD7SurveyActivity"

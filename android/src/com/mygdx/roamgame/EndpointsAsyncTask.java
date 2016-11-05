@@ -92,10 +92,13 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                         long score = Long.parseLong(entries[1]);
                         long gameDuration = Long.parseLong(entries[2])/1000;
                         int inputFrequency = Integer.parseInt(entries[3]);
+                        String timestamp = (entries[4]);
                         System.out.println("Score: " + String.valueOf(score));
 
+                        MenuActivity.userDB.insertScore(timestamp, userName, (int)score);
+                        //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                         //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
-                        myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency).execute();
+                        myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
                     } else if (entries[0].compareTo("event") == 0) {
 
 

@@ -20,13 +20,16 @@ public class GameInfoData {
     public Long gameDuration;
     @Index
     public int inputFrequency;
+    @Index
+    public String timestamp;
 
-    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf) {
+    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf, String ts) {
         id = gameID;
         user = u;
         score = s;
         gameDuration = gd;
         inputFrequency = inputf;
+        timestamp = ts;
     }
 
 }

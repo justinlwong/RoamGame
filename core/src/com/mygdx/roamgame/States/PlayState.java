@@ -39,6 +39,9 @@ import com.mygdx.roamgame.sprites.PoisonGrass;
 import com.mygdx.roamgame.sprites.Zombie;
 
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 
@@ -106,7 +109,7 @@ public class PlayState extends State {
     private PoisonGrass poisonGrass;
     private Array<Zombie> zombies;
     private Zombie zombie;
-    public static final int MAX_ZOMBIES = 16;
+    public static final int MAX_ZOMBIES = 25;
     private Array<Rectangle> zombiesBounds;
     private boolean abilityBoxPickedUp = false;
 
@@ -123,6 +126,8 @@ public class PlayState extends State {
     AbilityButton abilityButton;
     Texture buttonTexture;
     Texture invincibleButton;
+    Texture freezeButton;
+    Texture fastButton;
     Texture questionMarkSmall;
     Texture xscreen;
 
@@ -150,6 +155,8 @@ public class PlayState extends State {
     private Music heartBeatSound;
     private Sound pickupAbilitySound;
     private Music invincibilityMusic;
+    private Sound reaperFreezeModeMusic;
+    private Sound reaperFastModeMusic;
     private float pitch = 1f;
 
     // Fonts
@@ -197,6 +204,8 @@ public class PlayState extends State {
 
     // Abilities
     private boolean invincibleMode = false;
+    private boolean reaperFreezeMode = false;
+    private boolean reaperFastMode = false;
     private boolean abilityActive = false;
     private float abilityBox_X;
     private float abilityBox_Y;
@@ -298,6 +307,8 @@ public class PlayState extends State {
 
         buttonTexture = new Texture("questionbox.png");
         invincibleButton = new Texture("invincible.png");
+        freezeButton = new Texture("ice.png");
+        fastButton = new Texture("danger.png");
         abilityButton = new AbilityButton(buttonTexture);
         questionMarkSmall = new Texture("questionbox_small.png");
 
@@ -410,6 +421,8 @@ public class PlayState extends State {
         pickupItemSound = Gdx.audio.newSound(Gdx.files.internal("pickupSound.mp3"));
         pickupAbilitySound = Gdx.audio.newSound(Gdx.files.internal("abilityBox.mp3"));
         invincibilityMusic = Gdx.audio.newMusic(Gdx.files.internal("invincible.wav"));
+        reaperFastModeMusic = Gdx.audio.newSound(Gdx.files.internal("laugh.wav"));
+        reaperFreezeModeMusic = Gdx.audio.newSound(Gdx.files.internal("freeze.wav"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
         splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
         heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
@@ -462,7 +475,13 @@ public class PlayState extends State {
                     prefs.putInteger("factor1", (int)currentFactor1);
                     prefs.putInteger("factor2", (int)currentFactor2);
                     prefs.flush();
-                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
+
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss");//dd/MM/yyyy
+                    Date now = new Date();
+                    String strDate = sdfDate.format(now);
+
+
+                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
                     gsm.set(new ScoreScreenState(gsm));
                 }
 
@@ -548,8 +567,8 @@ public class PlayState extends State {
                 }
 
                 // chance of ability box
-
-                int num = MathUtils.random(0, 3);
+                Random rand = new Random();
+                int num = rand.nextInt(1);
                 System.out.println("num: " + num);
                 if (num == 0) {
                     Timer.schedule(new Timer.Task() {
@@ -782,7 +801,7 @@ public class PlayState extends State {
         }
 
         if (Gdx.input.justTouched()) {
-            //System.out.println("just touched");
+            System.out.println("just touched");
             lastTouchedPointX = Gdx.input.getX();
             lastTouchedPointY = Gdx.input.getY();
 
@@ -993,13 +1012,14 @@ public class PlayState extends State {
                 //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
                 // Clear item
                 subMaze.occupiedGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] = -1;
-                if (abilityActive != true) {
+                if (abilityActive != true && abilityBoxPickedUp != true) {
                     abilityBoxPickedUp = true;
                     abilityButton.setTexture(buttonTexture);
                     pickupAbilitySound.play(0.5f);
+                    abilityBoxes.removeIndex(index);
                 }
 
-                abilityBoxes.removeIndex(index);
+
 
 
             }
@@ -1104,19 +1124,24 @@ public class PlayState extends State {
         for (int i = 0; i < zombies.size; i++) {
             //Zombie z =
             zombie = zombies.get(i);
-
+            zombie.move(zombie.getDirection());
+            zombie.update(dt);
 
             //System.out.println(zombie.getDirection());
             if (zombie.getPosition().y <= 0) {
+                zombie.setPosition(zombie.oldPosition.x, zombie.oldPosition.y);
                 zombie.setDirection(PlayState.UP);
             }
             else if (zombie.getPosition().y >= (subMaze.pixelHeight - zombie.getTexture().getRegionHeight())) {
+                zombie.setPosition(zombie.oldPosition.x, zombie.oldPosition.y);
                 zombie.setDirection(PlayState.DOWN);
             }
             else if (zombie.getPosition().x <= 0) {
+                zombie.setPosition(zombie.oldPosition.x, zombie.oldPosition.y);
                 zombie.setDirection(PlayState.RIGHT);
             }
             else if (zombie.getPosition().x >= (subMaze.pixelWidth - zombie.getTexture().getRegionWidth())) {
+                zombie.setPosition(zombie.oldPosition.x, zombie.oldPosition.y);
                 zombie.setDirection(PlayState.LEFT);
             }
 
@@ -1132,35 +1157,41 @@ public class PlayState extends State {
                 }
             }
 
-            if (overlapped == true)
-            {
-                //System.out.println("overlapped");
+            if (overlapped == true) {
+                //System.out.println("overlapped (curpos : " + zombie.getPosition().x + " " +  zombie.getPosition().y + " " + zombie.oldPosition.x + " " + zombie.oldPosition.y + ")");
                 zombie.setPosition(zombie.oldPosition.x, zombie.oldPosition.y);
 
-                if (zombie.getDirection() == PlayState.UP) {
-                    //System.out.println(i + " up");
-                    zombie.setDirection(PlayState.LEFT);
+                int oldDir = zombie.getDirection();
+                Random rand = new Random();
+                int newDir = rand.nextInt(4);
+
+                while (newDir == oldDir)
+                {
+                    newDir = rand.nextInt(4);
                 }
-                else if (zombie.getDirection() == PlayState.LEFT) {
-                    //System.out.println(i + " left");
-                    zombie.setDirection(PlayState.DOWN);
-                }
-                else if (zombie.getDirection() == PlayState.DOWN) {
-                    //System.out.println(i + " down");
-                    zombie.setDirection(PlayState.RIGHT);
-                }
-                else if (zombie.getDirection() == PlayState.RIGHT) {
-                    //System.out.println(i + " right");
-                    zombie.setDirection(PlayState.UP);
-                }
+
+                zombie.setDirection(newDir);
+
+                //System.out.println("fixing pos (curpos : " + zombie.getPosition().x + " " +  zombie.getPosition().y + " " + zombie.oldPosition.x + " " + zombie.oldPosition.y + ")");
+
+//                if (zombie.getDirection() == PlayState.UP) {
+//                    //System.out.println(i + " up");
+//                    zombie.setDirection(PlayState.LEFT);
+//                }
+//                else if (zombie.getDirection() == PlayState.LEFT) {
+//                    //System.out.println(i + " left");
+//                    zombie.setDirection(PlayState.DOWN);
+//                }
+//                else if (zombie.getDirection() == PlayState.DOWN) {
+//                    //System.out.println(i + " down");
+//                    zombie.setDirection(PlayState.RIGHT);
+//                }
+//                else if (zombie.getDirection() == PlayState.RIGHT) {
+//                    //System.out.println(i + " right");
+//                    zombie.setDirection(PlayState.UP);
+//                }
             }
-
             //System.out.println(z.getDirection());
-            zombie.move(zombie.getDirection());
-
-            zombie.update(dt);
-
-
 
             zombies.set(i, zombie);
             if(zombie.getBounds().overlaps(player.getBounds())) {
@@ -1184,15 +1215,16 @@ public class PlayState extends State {
             if((TimeUtils.millis() - lastZombieChangeTime) > 1*SEC)
             {
                 int zombieDir = zRand.nextInt(NUM_POS);
-                int chance = zRand.nextInt(3);
+                int chance = zRand.nextInt(1);
+                //if (chance == 0) {
+                //    zombies.get(i).setTurboOn(false);
+                //    zombies.get(i).setDirection(zombieDir);
+                //    zombies.get(i).setSpeedFaster();
+                //} else
                 if (chance == 0) {
-                    zombies.get(i).setTurboOn(false);
-                    zombies.get(i).setDirection(zombieDir);
-                    zombies.get(i).setSpeedFaster();
-                } else if (chance == 1) {
                     //System.out.println("turbo on");
                     zombies.get(i).setDirection(zombieDir);
-                    zombies.get(i).setTurboOn(true);
+                    //zombies.get(i).setTurboOn(true);
                 }
 
                 lastZombieChangeTime = TimeUtils.millis();
@@ -1200,7 +1232,7 @@ public class PlayState extends State {
         }
 
         // Spawn new zombie every 2 seconds
-        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(2000, 5000 - levelCounter*150))
+        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(2000, 7000 - levelCounter*700))
             spawnZombie();
     }
 
@@ -1296,7 +1328,12 @@ public class PlayState extends State {
             prefs.putInteger("factor2", (int)currentFactor2);
             prefs.flush();
 
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
+
+            SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss");//dd/MM/yyyy
+            Date now = new Date();
+            String strDate = sdfDate.format(now);
+
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
             gsm.set(new ScoreScreenState(gsm));
         }
     }
@@ -1717,11 +1754,17 @@ public class PlayState extends State {
                 {
                     abilityActive = true;
                     // choose an ability randomly
-                    int mode = 0;
+                    Random rand = new Random();
+                    int mode = rand.nextInt(3);
+
+                    System.out.println("ability mode: "+mode);
 
                     if (mode == 0) {
                         setInvincibilityMode();
-
+                    } else if (mode == 1) {
+                        setZombieFastMode();
+                    } else if (mode == 2) {
+                        setZombieFreezeMode();
                     }
                 }
             }
@@ -1773,6 +1816,75 @@ public class PlayState extends State {
                     }
                 }, 5);
     }
+
+    public void setZombieFastMode()
+    {
+        abilityButton.setTexture(fastButton);
+
+        // all reapers speed up
+        for (Zombie z : zombies)
+        {
+            z.setTurboOn(true);
+        }
+
+        //reaperFastModeMusic.setLooping(true);
+        reaperFastModeMusic.play();
+        reaperFastMode = true;
+
+        // last for 5 seconds
+        Timer.schedule(new Timer.Task() {
+
+            @Override
+            public void run() {
+                abilityBoxPickedUp = false;
+                abilityActive = false;
+                reaperFastMode = false;
+                //reaperFastModeMusic.stop();
+
+                // all reapers back to normal
+                for (Zombie z : zombies)
+                {
+                    z.setTurboOn(false);
+                }
+
+            }
+        }, 5);
+    }
+
+    public void setZombieFreezeMode()
+    {
+        abilityButton.setTexture(freezeButton);
+
+        // all reapers speed up
+        for (Zombie z : zombies)
+        {
+            z.setFreezeOn(true);
+        }
+
+       // reaperFreezeModeMusic.setLooping(true);
+        reaperFreezeModeMusic.play();
+        reaperFreezeMode = true;
+
+        // last for 5 seconds
+        Timer.schedule(new Timer.Task() {
+
+            @Override
+            public void run() {
+                abilityBoxPickedUp = false;
+                abilityActive = false;
+                reaperFreezeMode = false;
+                //reaperFreezeModeMusic.stop();
+
+                // all reapers back to normal
+                for (Zombie z : zombies)
+                {
+                    z.setFreezeOn(false);
+                }
+
+            }
+        }, 5);
+    }
+
 
     @Override
     public void render(SpriteBatch sb, SpriteBatch hb) {
@@ -1841,8 +1953,9 @@ public class PlayState extends State {
             // randomly pick direction and position
             int zombieDir = zRand.nextInt(NUM_POS);
             //System.out.println(zombieDir);
-            int gridx = MathUtils.random(0, subMaze.gridWidth - 1);
-            int gridy = MathUtils.random(0, subMaze.gridHeight - 1);
+            Random rand = new Random();
+            int gridx = rand.nextInt(subMaze.gridWidth - 1);
+            int gridy = rand.nextInt(subMaze.gridHeight - 1);
             zombie.x = GRID_UNIT * gridx;
             zombie.y = GRID_UNIT * gridy;
             zombie.width = GRID_UNIT;
@@ -1852,17 +1965,46 @@ public class PlayState extends State {
 
             boolean overlapped = false;
 
+            int num_iterations = 0;
+
             for (int index = 0; index < subMaze.obstacles.size; index++) {
-                Rectangle item =subMaze.obstacles.get(index);
+                Rectangle item = subMaze.obstacles.get(index);
                 if (item.overlaps(newZombie.getBounds())) {
                     overlapped = true;
 
                 }
             }
+
+            while (num_iterations < 30 && overlapped == true)
+            {
+                overlapped = false;
+                gridx = rand.nextInt(subMaze.gridWidth - 1);
+                gridy = rand.nextInt(subMaze.gridHeight - 1);
+                zombie.x = GRID_UNIT * gridx;
+                zombie.y = GRID_UNIT * gridy;
+                newZombie = new Zombie(zombie.x, zombie.y, zombieDir, 0);
+                for (int index = 0; index < subMaze.obstacles.size; index++) {
+                    Rectangle item = subMaze.obstacles.get(index);
+                    if (item.overlaps(newZombie.getBounds())) {
+                        overlapped = true;
+
+                    }
+                }
+
+                num_iterations++;
+             }
             // check if location is occupied already
             if ((subMaze.occupiedGrid[gridy][gridx] == -1) && overlapped == false) {
                 zombiesBounds.add(zombie);
                 subMaze.occupiedGrid[gridy][gridx] = zombieDir;
+                if (reaperFreezeMode)
+                {
+                    newZombie.setFreezeOn(true);
+                }
+                if (reaperFastMode)
+                {
+                    newZombie.setTurboOn(true);
+                }
                 zombies.add(newZombie);
                 //Zombie z = zombies.get(i);
                 // System.out.println(z.getDirection());
@@ -1892,6 +2034,9 @@ public class PlayState extends State {
         gooTexture.dispose();
         redArrowUp.dispose();
         xscreen.dispose();
+        invincibleButton.dispose();
+        freezeButton.dispose();
+        fastButton.dispose();
     }
 
 }

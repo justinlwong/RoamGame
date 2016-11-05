@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,12 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LAST_NAME = "lastname";
     public static final String COLUMN_GENDER = "gender";
     public static final String COLUMN_AGE = "age";
+
+    public static final String TABLE_SCORES = "scores";
+    public static final String COLUMN_GAMEID = "gameid";
+    public static final String COLUMN_USERNAME = "username";
+    public static final String COLUMN_SCORE = "score";
+    public static final String COLUMN_TIMESTAMP = "timestamp";
 
     public static final String TABLE_GAMES = "games";
     public static final String COLUMN_GAME_ID = "gameid";
@@ -55,6 +62,13 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
             + " INTEGER not null, " + COLUMN_AGE
             + " text not null);";
 
+    private static final String DATABASE_CREATE_SCORES = "create table "
+            + TABLE_SCORES + "(" + COLUMN_TIMESTAMP
+            + " text primary key not null, " + COLUMN_USERNAME
+            + " text not null, " + COLUMN_SCORE
+            + " INTEGER not null);";
+
+
     private static final String DATABASE_CREATE_GAMES = "create table "
             + TABLE_GAMES+ "(" + COLUMN_GAME_ID
             + " INTEGER primary key autoincrement, " + COLUMN_DATE
@@ -85,6 +99,7 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE_PROFILES);
+        database.execSQL(DATABASE_CREATE_SCORES);
         /*database.execSQL(DATABASE_CREATE_GAMES);
         database.execSQL(DATABASE_CREATE_LOGS);
         database.execSQL(DATABASE_CREATE_LEVELS);*/
@@ -108,6 +123,25 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
             return true;
     }
 
+    public boolean insertScore ( String timestamp, String name, Integer score)
+    {
+        int retVal = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_TIMESTAMP, timestamp);
+        contentValues.put(COLUMN_USERNAME, name);
+        contentValues.put(COLUMN_SCORE, score);
+
+        retVal = (int)db.insertWithOnConflict(TABLE_SCORES, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+
+
+
+        if (retVal < 0)
+            return false;
+        else
+            return true;
+    }
+
     public String getUserName ()
     {
         String userName = "John Doe";
@@ -120,6 +154,26 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
             userName = resultSet.getString(ind);
         return userName;
 
+    }
+
+    public ArrayList<Score> getScores()
+    {
+        Log.d("scores", "getting scores");
+        ArrayList<Score> scores = new ArrayList<Score>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor resultSet = db.rawQuery("Select * From " + TABLE_SCORES, null);
+        resultSet.moveToFirst();
+        while(!resultSet.isAfterLast())
+        {
+            Score s = new Score(resultSet.getString(resultSet.getColumnIndex(COLUMN_USERNAME)),resultSet.getInt(resultSet.getColumnIndex(COLUMN_SCORE)));
+            scores.add(s);
+            Log.d("scores", String.valueOf(s.score));
+            resultSet.moveToNext();
+        }
+
+        System.out.println("done getting scores");
+
+        return scores;
     }
 
     @Override

@@ -17,6 +17,15 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/scoreScreenButton"
+        android:text="High Scores"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/entireProfileButton"
+        android:layout_centerInParent="true"
+        android:layout_weight="1"/>
     <!--<Button-->
         <!--android:id="@+id/userGuideButton"-->
         <!--android:text="Roam Game User Guide"-->
@@ -30,7 +39,7 @@
         android:text="Start Game"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/entireProfileButton"
+        android:layout_below="@+id/scoreScreenButton"
         android:layout_centerInParent="true"
         android:layout_weight="1"/>
 

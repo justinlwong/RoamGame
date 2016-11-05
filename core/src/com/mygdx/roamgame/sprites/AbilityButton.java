@@ -42,8 +42,9 @@ public class AbilityButton {
     }
 
     public boolean checkIfClicked (float ix, float iy) {
-        if (ix > skin.getX() && ix < skin.getX() + skin.getWidth()) {
-            if (iy > skin.getY() && iy < skin.getY() + skin.getHeight()) {
+        System.out.println("clicked location " + ix + " " + iy);
+        if (ix > skin.getX() && ix < (skin.getX() + skin.getWidth())) {
+            if (iy > skin.getY() && iy < (skin.getY() + skin.getHeight())) {
                 // the button was clicked, perform an action
                 System.out.println("Button clicked !");
                 return true;
