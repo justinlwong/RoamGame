@@ -150,6 +150,7 @@ public class PlayState extends State {
     private Music heartBeatSound;
     private Sound pickupAbilitySound;
     private Music invincibilityMusic;
+    private Music timerSound;
     private float pitch = 1f;
 
     // Fonts
@@ -221,7 +222,9 @@ public class PlayState extends State {
     private int levelBarrelStreak = 0;
     private int lastLevelScore;
     private Sound splashSound;
-
+    private long maxTimerVal;
+    private long curTimerVal;
+    private long timerCounter;
 
     public class PoisonObject
     {
@@ -413,6 +416,7 @@ public class PlayState extends State {
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
         splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
         heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
+        timerSound = Gdx.audio.newMusic(Gdx.files.internal("beep.wav"));
 
         // Textures
         fb = new Texture("bar.png");
@@ -1346,6 +1350,12 @@ public class PlayState extends State {
         {
             Gdx.app.log("resumed after cam update", player.getPosition().x + " " + player.getPosition().y);
         }
+
+        long msTime = System.currentTimeMillis();
+        if ((msTime - timerCounter > 1500) && (location == 1)) {
+            curTimerVal--;
+            timerCounter = TimeUtils.millis();
+        }
     }
 
     private void checkPlayerBounds()
@@ -1370,9 +1380,15 @@ public class PlayState extends State {
                 levelAnimationStart = TimeUtils.millis();
                 levelAnimation = true;
 
+                //update timer
+                curTimerVal = maxTimerVal;
+                maxTimerVal -= 2;
+                timerCounter = System.currentTimeMillis();
+                timerSound.stop();
             }
 
         } else if (location == 1) {
+
             for (int index = 0; index < subMaze.obstacles.size; index++) {
                 Rectangle item =subMaze.obstacles.get(index);
                 if (item.overlaps(player.getBounds())) {
@@ -1384,6 +1400,7 @@ public class PlayState extends State {
             if (subMaze.getExitRectangle().overlaps(player.getBounds())) {
                 location = 0;
                 transitionFrame = true;
+                timerSound.stop();
 
                 levelDuration = TimeUtils.millis() - levelStartTime;
 
@@ -1572,23 +1589,40 @@ public class PlayState extends State {
         Vector3 positionScore = new Vector3(0.03f*Gdx.graphics.getWidth(),0.9625f*Gdx.graphics.getHeight(), 0);
         font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         //font.draw(hb, "Score : " + String.valueOf(score), positionScore.x, positionScore.y);
-
         Label.LabelStyle textStyle;
         Label text;
-
         textStyle = new Label.LabelStyle();
         textStyle.font = font;
-
         text = new Label("Score : " + String.valueOf(score), textStyle);
         float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
         //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
         text.setFontScale(screenScale, screenScale);
         text.setPosition(positionScore.x, positionScore.y);
-
         text.draw(hb, 2f);
 
-        Label textTolerance;
+        //update timer
+        if((curTimerVal <= 0 ) && (location == 1)){
+            timerSound.stop();
+            deathSound.play();
+            score = score/2;
+            gameDuration = TimeUtils.millis() - gameStartTime;
+            prefs.putInteger("score", score);
+            prefs.putInteger("factor1", (int)currentFactor1);
+            prefs.putInteger("factor2", (int)currentFactor2);
+            prefs.flush();
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
+            gsm.set(new ScoreScreenState(gsm));
+        } else if((curTimerVal < 20) && (location == 1)) {
+            bfont.setColor(255,0,0,1);
+            timerSound.setLooping(true);
+            timerSound.setVolume(0.3f);
+            timerSound.play();
+        } else {
+            bfont.setColor(new Color(255, 255, 0, 1));
+        }
+        bfont.draw(hb, "Timer : " + String.valueOf(curTimerVal), Gdx.graphics.getWidth()/2-(bfont.getSpaceWidth()*9), 0.92f*Gdx.graphics.getHeight());
 
+        Label textTolerance;
         textStyle = new Label.LabelStyle();
         textStyle.font = font;
         if (resumeFlag == true)
@@ -1892,6 +1926,7 @@ public class PlayState extends State {
         gooTexture.dispose();
         redArrowUp.dispose();
         xscreen.dispose();
+        timerSound.dispose();
     }
 
 }
