@@ -291,6 +291,7 @@ public class PlayState extends State {
         prefs = Gdx.app.getPreferences("Stats");
         lastHitTime = 0;
         lastPoisonedTime = 0;
+        maxTimerVal = 60;
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
 
