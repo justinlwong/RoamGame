@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Pair;
+import android.view.Menu;
 import android.widget.Toast;
 
 import com.badlogic.gdx.Gdx;
@@ -28,12 +29,12 @@ import java.io.IOException;
 import java.util.Random;
 
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
-    private static MyApi myApiService = null;
+    //private static MyApi myApiService = null;
     private Context context;
 
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
-        if(myApiService == null) {  // Only do this once
+        if(MenuActivity.myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     //.setRootUrl("http://10.0.2.2:8080/_ah/api/")
@@ -50,7 +51,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
 
             // end options for devappserver
 
-            myApiService = builder.build();
+            MenuActivity.myApiService = builder.build();
         }
 
         System.out.println("background");
@@ -98,7 +99,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                         MenuActivity.userDB.insertScore(timestamp, userName, (int)score);
                         //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                         //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
-                        myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
+                        MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
                     } else if (entries[0].compareTo("event") == 0) {
 
 
@@ -117,7 +118,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                         int exitDistance = Integer.parseInt(entries[12]);
 
                         //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
-                        myApiService.uploadEventData(gameID, userName,(int)timeStamp, levelNo, evenType, (int)cHealth, (int)cScore, (int)cLScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance).execute();
+                        MenuActivity.myApiService.uploadEventData(gameID, userName,(int)timeStamp, levelNo, evenType, (int)cHealth, (int)cScore, (int)cLScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance).execute();
                     }
 
 
@@ -146,7 +147,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
 
 
         try {
-            return myApiService.sayHi(name).execute().getData();
+            return MenuActivity.myApiService.sayHi(name).execute().getData();
         } catch (IOException e) {
             return e.getMessage();
        }

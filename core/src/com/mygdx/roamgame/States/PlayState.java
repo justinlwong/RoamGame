@@ -158,6 +158,7 @@ public class PlayState extends State {
     private Sound reaperFreezeModeMusic;
     private Sound reaperFastModeMusic;
     private Music timerSound;
+    private Music hauntSound;
 
     private float pitch = 1f;
 
@@ -236,6 +237,7 @@ public class PlayState extends State {
     private long curTimerVal;
     private long timerCounter;
 
+
     public class PoisonObject
     {
         public Rectangle rect;
@@ -301,7 +303,7 @@ public class PlayState extends State {
         prefs = Gdx.app.getPreferences("Stats");
         lastHitTime = 0;
         lastPoisonedTime = 0;
-        maxTimerVal = 60;
+        maxTimerVal = 40;
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
 
@@ -431,7 +433,8 @@ public class PlayState extends State {
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
         splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
         heartBeatSound = Gdx.audio.newMusic(Gdx.files.internal("heartbeat.wav"));
-        timerSound = Gdx.audio.newMusic(Gdx.files.internal("beep.wav"));
+        timerSound = Gdx.audio.newMusic(Gdx.files.internal("tick.mp3"));
+        hauntSound = Gdx.audio.newMusic(Gdx.files.internal("haunting.mp3"));
 
         // Textures
         fb = new Texture("bar.png");
@@ -1421,9 +1424,13 @@ public class PlayState extends State {
 
                 //update timer
                 curTimerVal = maxTimerVal;
-                maxTimerVal -= 2;
+                if (maxTimerVal>10)
+                    maxTimerVal -= 2;
+                else
+                    maxTimerVal = 10;
                 timerCounter = System.currentTimeMillis();
                 timerSound.stop();
+                hauntSound.stop();
             }
 
         } else if (location == 1) {
@@ -1440,6 +1447,7 @@ public class PlayState extends State {
                 location = 0;
                 transitionFrame = true;
                 timerSound.stop();
+                hauntSound.stop();
 
                 levelDuration = TimeUtils.millis() - levelStartTime;
 
@@ -1642,6 +1650,7 @@ public class PlayState extends State {
         //update timer
         if((curTimerVal <= 0 ) && (location == 1)){
             timerSound.stop();
+            hauntSound.stop();
             deathSound.play();
             score = score/2;
             gameDuration = TimeUtils.millis() - gameStartTime;
@@ -1656,6 +1665,9 @@ public class PlayState extends State {
             timerSound.setLooping(true);
             timerSound.setVolume(0.3f);
             timerSound.play();
+            hauntSound.setLooping(true);
+            hauntSound.setVolume(0.3f);
+            hauntSound.play();
         } else {
             bfont.setColor(new Color(255, 255, 0, 1));
         }

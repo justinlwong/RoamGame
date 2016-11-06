@@ -2,6 +2,8 @@ package com.mygdx.roamgame;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Pair;
@@ -12,11 +14,18 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.mygdx.roamgame.backend.myApi.MyApi;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+
 public class MenuActivity extends Activity {
 
     Context context;
     public static RoamGameSQLiteHelper userDB;
-    private static MyApi myApiService = null;
+    public static MyApi myApiService = null;
 
     @Override
     public void onResume() {
@@ -24,9 +33,64 @@ public class MenuActivity extends Activity {
 
         System.out.println("resumed");
 
+        addDatatoLocalDB();
+
         new EndpointsAsyncTask().execute(new Pair<Context, String>(this, "Justin"));
 
 
+    }
+
+    public void addDatatoLocalDB()
+    {
+        PackageManager m = context.getPackageManager();
+        String s = context.getPackageName();
+        PackageInfo p = null;
+        try {
+            p = m.getPackageInfo(s, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        s = p.applicationInfo.dataDir;
+        String filepath = s + "/files/gameInfoLog.txt";
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filepath));
+            String log = br.readLine();
+            String userName = MenuActivity.userDB.getUserName();
+            if (userName == null)
+                userName = "JohnDoe";
+            Random rand = new Random();
+            while (log != null) {
+                String[] entries = log.split(" ");
+                System.out.println(String.valueOf(entries.length));
+                if (entries != null && entries.length > 1) {
+
+                    if (entries[0].compareTo("game") == 0) {
+                        long score = Long.parseLong(entries[1]);
+                        String timestamp = (entries[4]);
+                        System.out.println("Score: " + String.valueOf(score));
+
+                        MenuActivity.userDB.insertScore(timestamp, userName, (int)score);
+
+                        return;
+
+                    }
+
+                }
+
+                log = br.readLine();
+
+            }
+
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return;
     }
 
     @Override

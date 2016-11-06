@@ -1,4 +1,19 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal">
+<TextView
+    android:id="@+id/title"
+    android:text="High Scores"
+    android:gravity="center_horizontal"
+    android:layout_marginTop="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="50dp" />
+<ListView
     android:id="@+id/listview"
+    android:layout_marginLeft="5dp"
+    android:layout_marginTop="20dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
+</LinearLayout>

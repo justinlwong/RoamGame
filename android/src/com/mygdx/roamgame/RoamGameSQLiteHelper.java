@@ -156,19 +156,22 @@ public class RoamGameSQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<Score> getScores()
+    public ArrayList<Score> getHighScores()
     {
         Log.d("scores", "getting scores");
+        int max = 10;
+        int num_entries = 0;
         ArrayList<Score> scores = new ArrayList<Score>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor resultSet = db.rawQuery("Select * From " + TABLE_SCORES, null);
         resultSet.moveToFirst();
-        while(!resultSet.isAfterLast())
+        while((!resultSet.isAfterLast()) && (num_entries < max))
         {
             Score s = new Score(resultSet.getString(resultSet.getColumnIndex(COLUMN_USERNAME)),resultSet.getInt(resultSet.getColumnIndex(COLUMN_SCORE)));
             scores.add(s);
             Log.d("scores", String.valueOf(s.score));
             resultSet.moveToNext();
+            num_entries++;
         }
 
         System.out.println("done getting scores");

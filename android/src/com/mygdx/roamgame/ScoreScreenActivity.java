@@ -10,6 +10,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by Justin on 2016-11-01.
@@ -20,8 +23,9 @@ public class ScoreScreenActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scores);
-        ArrayList<Score> scores =  MenuActivity.userDB.getScores();
-        Log.d("scores", scores.get(0).name);
+        ArrayList<Score> scores =  MenuActivity.userDB.getHighScores();
+        Collections.sort(scores);
+        //Log.d("scores", scores.get(0).name);
         final ScoreArrayAdapter adapter = new ScoreArrayAdapter(this, scores);
 
         final ListView listview = (ListView) findViewById(R.id.listview);
