@@ -194,11 +194,13 @@ public class PlayState extends State {
     Dialog tut3Dialog;
     Dialog tut4Dialog;
     Dialog tut5Dialog;
+    Dialog tut6Dialog;
     boolean tut1Complete;
     boolean tut2Complete;
     boolean tut3Complete;
     boolean tut4Complete;
     boolean tut5Complete;
+    boolean tut6Complete;
 
     // UI
     ShapeRenderer srender;
@@ -619,6 +621,7 @@ public class PlayState extends State {
         tut3Complete = false;
         tut4Complete = false;
         tut5Complete = false;
+        tut6Complete = false;
 
         tut1Dialog = new Dialog("Tutorial Dialog", skin)
         {
@@ -630,7 +633,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.25f*Gdx.graphics.getHeight();
+                return 0.35f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -656,7 +659,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.25f*Gdx.graphics.getHeight();
+                return 0.35f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -670,7 +673,9 @@ public class PlayState extends State {
         tut2Dialog.text(("Welcome to Roam Game! \n" +
                 "Navigate the maze to find the exit!\n" +
                 "Collect Barrels to gain points!\n" +
-                "Avoid Reapers and Poison Grass!"));
+                "Avoid Reapers and Poison Grass!\n" +
+                "FIND THE EXIT BEFORE THE TIMER EXPIRES OR YOU DIE!\n" +
+                "BEWARE, THE TIMER VALUE DECREASES FOR SUCCESSIVE SUBMAZES!"));
 
         tut3Dialog = new Dialog("Tutorial Dialog", skin)
         {
@@ -698,9 +703,10 @@ public class PlayState extends State {
         tut3Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
         tut3Dialog.button("Press to Continue", 1L);
         tut3Dialog.text(("Good job! Collect Barrels to gain points! \n" +
-                "Your points will be multiplied for each consecutive barrel that is collected!\n" +
-                "Barrels can also be used for health, but doing so will break the\n" +
-                "multiplicative points factor!"));
+                "Collecting successive barrels will create a streak\n" +
+                "and will dramatically increase points!\n" +
+                "Barrels can also be used for health, but doing so will break the streak!\n" +
+                "Collecting all 4 barrels in the submaze will lead to even greater points!"));
 
         tut4Dialog = new Dialog("Tutorial Dialog", skin)
         {
@@ -736,7 +742,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.50f*Gdx.graphics.getHeight();
+                return 0.25f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -750,6 +756,35 @@ public class PlayState extends State {
         tut5Dialog.text(("OOPS! Avoid collisions with Poison Grass! \n" +
                 "Collisions with Poison Grass will slow speed for a period of time!\n"));
 
+        tut6Dialog = new Dialog("Tutorial Dialog", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.50f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+                dialogShowing = false;
+            }
+        };
+        tut6Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
+        tut6Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut6Dialog.button("Press to Continue", 1L);
+        tut6Dialog.text(("Congrats on collecting an item box! Click on the item box to use it! \n" +
+                "Item boxes can be good or bad!\n" +
+                "The good outcomes include:\n" +
+                "1) ice: reapers freezing for 5 seconds\n" +
+                "2) invincibility: invulnerability for 5 seconds\n" +
+                "The negative outcomes include:\n" +
+                "4) danger: reapers speed increasing for 5 seconds\n" +
+                "You can use the box any time, but use it wisely!"));
     } // function
 
     @Override
@@ -1391,7 +1426,7 @@ public class PlayState extends State {
         }
 
         long msTime = System.currentTimeMillis();
-        if ((msTime - timerCounter > 1500) && (location == 1)) {
+        if ((msTime - timerCounter > 1500) && (location == 1) && (dialogShowing == false)) {
             curTimerVal--;
             timerCounter = TimeUtils.millis();
         }
@@ -1784,6 +1819,12 @@ public class PlayState extends State {
         //hb.setColor(c.r, c.g, c.b, 1f);
 
         if (abilityBoxPickedUp) {
+            if (!tut6Complete) {
+                tut6Dialog.show(stage);
+                tut6Complete = true;
+                dialogShowing = true;
+            }
+
             abilityButton.update(hb);
             if (Gdx.input.isTouched()) {
                 if ((abilityActive == false) && abilityButton.checkIfClicked(lastTouchedPointX, Gdx.graphics.getHeight() - lastTouchedPointY))
