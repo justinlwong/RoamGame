@@ -26,25 +26,28 @@ public class AbilityButton {
 
     public AbilityButton(Texture texture) {
         skin = createScaledSprite(texture);
-        skin.setPosition(0.97f*Gdx.graphics.getWidth() - skin.getWidth(), 0.03f*Gdx.graphics.getHeight());
+        //skin.setPosition(0.97f*Gdx.graphics.getWidth() - skin.getWidth(), 0.03f*Gdx.graphics.getHeight());
 
     }
 
-    public void setTexture(Texture texture)
-    {
-        skin = createScaledSprite(texture);
-        skin.setPosition(0.97f*Gdx.graphics.getWidth() - skin.getWidth(), 0.03f*Gdx.graphics.getHeight());
-    }
+    //public void setTexture(Texture texture)
+   // {
+   //     skins[0] = createScaledSprite(texture);
+   //     skins[0].setPosition(0.97f*Gdx.graphics.getWidth() - skins[0].getWidth(), 0.03f*Gdx.graphics.getHeight());
+    //}
 
-    public void update (SpriteBatch batch) {
+    public void update (SpriteBatch batch, int numBoxes) {
 
-        skin.draw(batch); // draw the button
+        for (int i =0; i<numBoxes; i++) {
+            skin.setPosition(0.97f*Gdx.graphics.getWidth() - skin.getWidth() - ((float)i)*(0.01f*Gdx.graphics.getWidth() + skin.getWidth()), 0.03f*Gdx.graphics.getHeight());
+            skin.draw(batch); // draw the button
+        }
     }
 
     public boolean checkIfClicked (float ix, float iy) {
         System.out.println("clicked location " + ix + " " + iy);
-        if (ix > skin.getX() && ix < (skin.getX() + skin.getWidth())) {
-            if (iy > skin.getY() && iy < (skin.getY() + skin.getHeight())) {
+        if (ix > (0.97f*Gdx.graphics.getWidth() - skin.getWidth()) && ix < (0.97f*Gdx.graphics.getWidth())) {
+            if (iy > (0.03f*Gdx.graphics.getHeight()) && iy < (0.03f*Gdx.graphics.getHeight() + skin.getHeight())) {
                 // the button was clicked, perform an action
                 System.out.println("Button clicked !");
                 return true;

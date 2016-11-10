@@ -125,9 +125,12 @@ public class PlayState extends State {
     Texture gooTexture;
     AbilityButton abilityButton;
     Texture buttonTexture;
-    Texture invincibleButton;
-    Texture freezeButton;
-    Texture fastButton;
+    Texture invincibleButtonTexture;
+    Texture freezeButtonTexture;
+    Texture fastButtonTexture;
+    Sprite invincibleButton;
+    Sprite freezeButton;
+    Sprite fastButton;
     Texture questionMarkSmall;
     Texture xscreen;
 
@@ -159,6 +162,7 @@ public class PlayState extends State {
     private Sound reaperFastModeMusic;
     private Music timerSound;
     private Music hauntSound;
+    private Sound clinkSound;
 
     private float pitch = 1f;
 
@@ -212,6 +216,7 @@ public class PlayState extends State {
     private boolean abilityActive = false;
     private float abilityBox_X;
     private float abilityBox_Y;
+    private int numBoxes = 0;
 
     int [][]touchArray = new int[][]
             {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -303,7 +308,7 @@ public class PlayState extends State {
         prefs = Gdx.app.getPreferences("Stats");
         lastHitTime = 0;
         lastPoisonedTime = 0;
-        maxTimerVal = 40;
+        maxTimerVal = 48;
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
         subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
 
@@ -313,9 +318,30 @@ public class PlayState extends State {
         player = new Player(startRoom.getStartingPosX(), startRoom.getStartingPosY(), subMaze.pixelHeight, subMaze.pixelWidth, person, gooTexture);
 
         buttonTexture = new Texture("questionbox.png");
-        invincibleButton = new Texture("invincible.png");
-        freezeButton = new Texture("ice.png");
-        fastButton = new Texture("danger.png");
+        invincibleButtonTexture = new Texture("invincible.png");
+        freezeButtonTexture  = new Texture("ice.png");
+        fastButtonTexture  = new Texture("danger.png");
+
+        float SCALE_RATIO = 1080f / Gdx.graphics.getWidth();
+
+        invincibleButton = new Sprite(invincibleButtonTexture);
+        invincibleButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        invincibleButton.setSize(invincibleButton.getWidth() / SCALE_RATIO,
+                invincibleButton.getHeight() / SCALE_RATIO);
+
+        freezeButton = new Sprite(freezeButtonTexture);
+        freezeButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        freezeButton.setSize(freezeButton.getWidth() / SCALE_RATIO,
+                freezeButton.getHeight() / SCALE_RATIO);
+
+        fastButton = new Sprite(fastButtonTexture);
+        fastButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        fastButton.setSize(fastButton.getWidth() / SCALE_RATIO,
+                fastButton.getHeight() / SCALE_RATIO);
+
         abilityButton = new AbilityButton(buttonTexture);
         questionMarkSmall = new Texture("questionbox_small.png");
 
@@ -429,6 +455,7 @@ public class PlayState extends State {
         pickupAbilitySound = Gdx.audio.newSound(Gdx.files.internal("abilityBox.mp3"));
         invincibilityMusic = Gdx.audio.newMusic(Gdx.files.internal("invincible.wav"));
         reaperFastModeMusic = Gdx.audio.newSound(Gdx.files.internal("laugh.wav"));
+        clinkSound = Gdx.audio.newSound(Gdx.files.internal("clinksound.mp3"));
         reaperFreezeModeMusic = Gdx.audio.newSound(Gdx.files.internal("freeze.wav"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.wav"));
         splashSound = Gdx.audio.newSound(Gdx.files.internal("splash.wav"));
@@ -577,7 +604,7 @@ public class PlayState extends State {
 
                 // chance of ability box
                 Random rand = new Random();
-                int num = rand.nextInt(1);
+                int num = rand.nextInt(2);
                 System.out.println("num: " + num);
                 if (num == 0) {
                     Timer.schedule(new Timer.Task() {
@@ -1015,18 +1042,20 @@ public class PlayState extends State {
             Rectangle item = abilityBoxes.get(index);
             if (item.overlaps(player.getBounds())) {
 
-
-                // health boost for high value
-                //if (occupiedSubMazeGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] == 2) {
-                //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
-                // Clear item
-                subMaze.occupiedGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] = -1;
-                if (abilityActive != true && abilityBoxPickedUp != true) {
-                    abilityBoxPickedUp = true;
-                    abilityButton.setTexture(buttonTexture);
+                if (numBoxes<3) {
+                    // health boost for high value
+                    //if (occupiedSubMazeGrid[Math.round(item.y/GRID_UNIT)][Math.round(item.x/GRID_UNIT)] == 2) {
+                    //barrelChooseDialog.setSize(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3);
+                    // Clear item
+                    subMaze.occupiedGrid[Math.round(item.y / GRID_UNIT)][Math.round(item.x / GRID_UNIT)] = -1;
+                    numBoxes++;
+                    //if (abilityActive != true && abilityBoxPickedUp != true) {
+                    //abilityBoxPickedUp = true;
+                    //abilityButton.setTexture(buttonTexture);
                     pickupAbilitySound.play(0.5f);
                     abilityBoxes.removeIndex(index);
                 }
+                //}
 
 
 
@@ -1204,7 +1233,7 @@ public class PlayState extends State {
 
             zombies.set(i, zombie);
             if(zombie.getBounds().overlaps(player.getBounds())) {
-                if ((invincibleMode == false) &&(TimeUtils.millis() - lastHitTime) > (int)(0.5f*(float)SEC)) {
+                if ((invincibleMode == false) && (reaperFreezeMode == false) &&(TimeUtils.millis() - lastHitTime) > (int)(0.5f*(float)SEC)) {
                     healthBarVal+=20;
                     zombie.playSound();
                     lastHitTime = TimeUtils.millis();
@@ -1218,6 +1247,13 @@ public class PlayState extends State {
                     // log event
                     handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
 
+                }
+
+                if (reaperFreezeMode == true)
+                {
+                    // remove zombie
+                    zombies.removeIndex(i);
+                    clinkSound.play();
                 }
             }
 
@@ -1241,7 +1277,7 @@ public class PlayState extends State {
         }
 
         // Spawn new zombie every 2 seconds
-        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(2000, 7000 - levelCounter*700))
+        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 9000 - levelCounter*1000))
             spawnZombie();
     }
 
@@ -1658,7 +1694,13 @@ public class PlayState extends State {
             prefs.putInteger("factor1", (int)currentFactor1);
             prefs.putInteger("factor2", (int)currentFactor2);
             prefs.flush();
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + "\n", true);
+
+            SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss");//dd/MM/yyyy
+            Date now = new Date();
+            String strDate = sdfDate.format(now);
+
+
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
             gsm.set(new ScoreScreenState(gsm));
         } else if((curTimerVal < 20) && (location == 1)) {
             bfont.setColor(255,0,0,1);
@@ -1795,10 +1837,12 @@ public class PlayState extends State {
         //hb.draw(dpadCrossSprite, dPadPosition.x, dPadPosition.y);
         //hb.setColor(c.r, c.g, c.b, 1f);
 
-        if (abilityBoxPickedUp) {
-            abilityButton.update(hb);
+        //if (abilityBoxPickedUp) {
+            abilityButton.update(hb, numBoxes);
             if (Gdx.input.isTouched()) {
-                if ((abilityActive == false) && abilityButton.checkIfClicked(lastTouchedPointX, Gdx.graphics.getHeight() - lastTouchedPointY))
+                int pointX = Gdx.input.getX();
+                int pointY = Gdx.input.getY();
+                if ((numBoxes > 0) && (abilityActive == false) && abilityButton.checkIfClicked(pointX, Gdx.graphics.getHeight() - pointY))
                 {
                     abilityActive = true;
                     // choose an ability randomly
@@ -1806,6 +1850,9 @@ public class PlayState extends State {
                     int mode = rand.nextInt(3);
 
                     System.out.println("ability mode: "+mode);
+
+
+                        numBoxes--;
 
                     if (mode == 0) {
                         setInvincibilityMode();
@@ -1817,7 +1864,22 @@ public class PlayState extends State {
                 }
             }
 
+        if (reaperFreezeMode)
+        {
+            freezeButton.setPosition(0.03f*Gdx.graphics.getWidth() , 0.03f*Gdx.graphics.getHeight() );
+            freezeButton.draw(hb);
+
+        } else if (invincibleMode)
+        {
+            invincibleButton.setPosition(0.03f*Gdx.graphics.getWidth() , 0.03f*Gdx.graphics.getHeight() );
+            invincibleButton.draw(hb);
+        } else if (reaperFastMode)
+        {
+            fastButton.setPosition(0.03f*Gdx.graphics.getWidth(), 0.03f*Gdx.graphics.getHeight() );
+            fastButton.draw(hb);
         }
+
+        //}
 
         hb.end();
 
@@ -1843,7 +1905,7 @@ public class PlayState extends State {
 
     public void setInvincibilityMode()
     {
-        abilityButton.setTexture(invincibleButton);
+        //abilityButton.setTexture(invincibleButton);
 
         // reaper  hits won't hit
         player.boostPlayer(1.5f);
@@ -1856,7 +1918,7 @@ public class PlayState extends State {
 
                     @Override
                     public void run() {
-                        abilityBoxPickedUp = false;
+                        //abilityBoxPickedUp = false;
                         abilityActive = false;
                         invincibleMode = false;
                         invincibilityMusic.stop();
@@ -1867,7 +1929,7 @@ public class PlayState extends State {
 
     public void setZombieFastMode()
     {
-        abilityButton.setTexture(fastButton);
+        //abilityButton.setTexture(fastButton);
 
         // all reapers speed up
         for (Zombie z : zombies)
@@ -1884,7 +1946,7 @@ public class PlayState extends State {
 
             @Override
             public void run() {
-                abilityBoxPickedUp = false;
+                //abilityBoxPickedUp = false;
                 abilityActive = false;
                 reaperFastMode = false;
                 //reaperFastModeMusic.stop();
@@ -1901,7 +1963,7 @@ public class PlayState extends State {
 
     public void setZombieFreezeMode()
     {
-        abilityButton.setTexture(freezeButton);
+        //abilityButton.setTexture(freezeButton);
 
         // all reapers speed up
         for (Zombie z : zombies)
@@ -1918,7 +1980,7 @@ public class PlayState extends State {
 
             @Override
             public void run() {
-                abilityBoxPickedUp = false;
+                //abilityBoxPickedUp = false;
                 abilityActive = false;
                 reaperFreezeMode = false;
                 //reaperFreezeModeMusic.stop();
@@ -2082,12 +2144,12 @@ public class PlayState extends State {
         gooTexture.dispose();
         redArrowUp.dispose();
         xscreen.dispose();
-        if (invincibleButton != null)
-            invincibleButton.dispose();
-        if (freezeButton != null)
-            freezeButton.dispose();
-        if (fastButton != null)
-            fastButton.dispose();
+        if (invincibleButtonTexture != null)
+            invincibleButtonTexture.dispose();
+        if (freezeButtonTexture != null)
+            freezeButtonTexture.dispose();
+        if (fastButtonTexture != null)
+            fastButtonTexture.dispose();
         if (timerSound != null)
             timerSound.dispose();
 
