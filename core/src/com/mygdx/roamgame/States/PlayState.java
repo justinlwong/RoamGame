@@ -473,9 +473,9 @@ public class PlayState extends State {
         redArrowUp = new Texture(("redarrow.png"));
 
         // dialog setup
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = new Skin(Gdx.files.internal("star-soldier-ui.json"));
         float scaleFactor = Gdx.graphics.getWidth()/ 1080f;
-        skin.getFont("default-font").getData().setScale(scaleFactor, scaleFactor);
+        skin.getFont("title").getData();
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         im.addProcessor(stage);
@@ -487,7 +487,7 @@ public class PlayState extends State {
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         srender = new ShapeRenderer();
 
-        endLevelDialog = new Dialog(" ", skin)
+        endLevelDialog = new Dialog("\t End Level Dialog ", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -498,7 +498,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.40f*Gdx.graphics.getHeight();
+                return 0.65f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -528,9 +528,8 @@ public class PlayState extends State {
         };
 
         endLevelDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        endLevelDialog.getButtonTable().defaults().width(0.4f*Gdx.graphics.getWidth());
+        endLevelDialog.getButtonTable().defaults().width(0.5f*Gdx.graphics.getWidth());
         endLevelDialog.button("Continue at\nyour own peril", 1L);
-
         endLevelDialog.button("Cash out!", 2L);
         endLevelDialog.setBackground(new Image(xscreen).getDrawable());
         /*endLevelDialog.text(("Congrats on successfully navigating the submaze!\n" +
@@ -541,13 +540,13 @@ public class PlayState extends State {
         Window.WindowStyle style = new Window.WindowStyle();
         style.titleFont = bfont;
 
-        barrelChooseDialog = new Dialog("Points or health?", skin)
+        barrelChooseDialog = new Dialog("\t  Points or health?", skin)
         {
 
             @Override
             public float getPrefWidth() {
                 // force dialog width
-                return 0.5f*Gdx.graphics.getWidth();
+                return Gdx.graphics.getWidth();
             }
 
             @Override
@@ -630,7 +629,7 @@ public class PlayState extends State {
 
 
         barrelChooseDialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        barrelChooseDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 4);
+        barrelChooseDialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
 
         //barrelChooseDialog.getContentTable().defaults().height(0.1f* Gdx.graphics.getHeight());
 
@@ -653,7 +652,7 @@ public class PlayState extends State {
         tut5Complete = false;
         tut6Complete = false;
 
-        tut1Dialog = new Dialog("Tutorial Dialog", skin)
+        tut1Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -663,7 +662,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.35f*Gdx.graphics.getHeight();
+                return 0.50f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -672,14 +671,13 @@ public class PlayState extends State {
             }
         };
         tut1Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut1Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut1Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut1Dialog.button("Press to Continue", 1L);
-        tut1Dialog.text(("Welcome to Roam Game! This is the loading room,\n" +
-                "please walk forward through the exit to begin the game!\n" +
-                "To move, swipe on the screen in the direction you wish to travel.\n" +
-                "You can either continuosly drag or swipe to move! "));
+                "Please walk forward through the exit to begin the game!\n\n" +
+                "To move, swipe on the screen in the direction you wish to travel.\n\n" +
+                "You can either continuously drag or swipe to move!", skin);
 
-        tut2Dialog = new Dialog("Tutorial Dialog", skin)
+        tut2Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -689,7 +687,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.35f*Gdx.graphics.getHeight();
+                return 0.50f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -698,16 +696,15 @@ public class PlayState extends State {
             }
         };
         tut2Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut2Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut2Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut2Dialog.button("Press to Continue", 1L);
-        tut2Dialog.text(("Welcome to Roam Game! \n" +
-                "Navigate the maze to find the exit!\n" +
-                "Collect Barrels to gain points!\n" +
-                "Avoid Reapers and Poison Grass!\n" +
-                "FIND THE EXIT BEFORE THE TIMER EXPIRES OR YOU DIE!\n" +
-                "BEWARE, THE TIMER VALUE DECREASES FOR SUCCESSIVE SUBMAZES!"));
+        Label txt2 = new Label("Welcome to Roam Game!\n\nNavigate the maze to find the exit!\n\n" +
+                "Collect Barrels to gain points!\n\nAvoid Reapers and Poison Grass!\n\n" +
+                "FIND THE EXIT BEFORE THE TIMER EXPIRES OR YOU DIE!", skin);
+        txt2.setWrap(true);
+        tut2Dialog.getContentTable().add(txt2).prefWidth(Gdx.graphics.getWidth()-25);
 
-        tut3Dialog = new Dialog("Tutorial Dialog", skin)
+        tut3Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -730,15 +727,17 @@ public class PlayState extends State {
             }
         };
         tut3Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut3Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut3Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut3Dialog.button("Press to Continue", 1L);
-        tut3Dialog.text(("Good job! Collect Barrels to gain points! \n" +
-                "Collecting successive barrels will create a streak\n" +
-                "and will dramatically increase points!\n" +
-                "Barrels can also be used for health, but doing so will break the streak!\n" +
-                "Collecting all 4 barrels in the submaze will lead to even greater points!"));
+        Label txt3 = new Label("Good job! Collect Barrels to gain points!\n\n" +
+                "Collecting successive barrels will create a streak" +
+                " and will dramatically increase points!\n\n" +
+                "Barrels can also be used for health, but doing so will break the streak!\n\n" +
+                "Collecting all 4 barrels in each submaze will lead to even greater points!", skin);
+        txt3.setWrap(true);
+        tut3Dialog.getContentTable().add(txt3).prefWidth(Gdx.graphics.getWidth()-25);
 
-        tut4Dialog = new Dialog("Tutorial Dialog", skin)
+        tut4Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -748,7 +747,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.25f*Gdx.graphics.getHeight();
+                return 0.35f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -757,12 +756,14 @@ public class PlayState extends State {
             }
         };
         tut4Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut4Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut4Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut4Dialog.button("Press to Continue", 1L);
-        tut4Dialog.text(("OOPS! Avoid collisions with Reapers ! \n" +
-                "Collisions with Reapers will greatly reduce health!\n"));
+        Label txt4 = new Label("OOPS! Avoid collisions with Reapers!\n\n" +
+                "Collisions with Reapers will greatly reduce health!", skin);
+        txt4.setWrap(true);
+        tut4Dialog.getContentTable().add(txt4).prefWidth(Gdx.graphics.getWidth()-25);
 
-        tut5Dialog = new Dialog("Tutorial Dialog", skin)
+        tut5Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -772,7 +773,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.25f*Gdx.graphics.getHeight();
+                return 0.35f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -781,12 +782,14 @@ public class PlayState extends State {
             }
         };
         tut5Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut5Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut5Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut5Dialog.button("Press to Continue", 1L);
-        tut5Dialog.text(("OOPS! Avoid collisions with Poison Grass! \n" +
-                "Collisions with Poison Grass will slow speed for a period of time!\n"));
+        Label txt5 = new Label("OOPS! Avoid collisions with Poison Grass!\n\n" +
+                "Collisions with Poison Grass will slow speed for a period of time!", skin);
+        txt5.setWrap(true);
+        tut5Dialog.getContentTable().add(txt5).prefWidth(Gdx.graphics.getWidth()-25);
 
-        tut6Dialog = new Dialog("Tutorial Dialog", skin)
+        tut6Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
             @Override
             public float getPrefWidth() {
@@ -796,7 +799,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.50f*Gdx.graphics.getHeight();
+                return 0.60f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -805,16 +808,20 @@ public class PlayState extends State {
             }
         };
         tut6Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
-        tut6Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth() / 2);
+        tut6Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut6Dialog.button("Press to Continue", 1L);
-        tut6Dialog.text(("Congrats on collecting an item box! Click on the item box to use it! \n" +
-                "Item boxes can be good or bad!\n" +
+        Label txt6 = new Label("Congratulations on collecting an item box! Click on the item box to use it!\n\n" +
+                "Item boxes can be good or bad!\n\n" +
                 "The good outcomes include:\n" +
-                "1) ice: reapers freezing for 5 seconds\n" +
-                "2) invincibility: invulnerability for 5 seconds\n" +
+                "1) ice: reapers freezing and being able to be destroyed for 5 seconds\n" +
+                "2) invincibility: invulnerability for 5 seconds\n\n" +
                 "The negative outcomes include:\n" +
-                "4) danger: reapers speed increasing for 5 seconds\n" +
-                "You can use the box any time, but use it wisely!"));
+                "1) danger: reapers speed increasing for 5 seconds\n\n" +
+                "You can use the box any time, but use it wisely!", skin);
+        txt6.setWrap(true);
+        tut6Dialog.getContentTable().add(txt6).prefWidth(Gdx.graphics.getWidth()-25);
+
+
     } // function
 
     @Override
