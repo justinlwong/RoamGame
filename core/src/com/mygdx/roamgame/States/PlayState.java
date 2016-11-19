@@ -474,8 +474,8 @@ public class PlayState extends State {
 
         // dialog setup
         skin = new Skin(Gdx.files.internal("star-soldier-ui.json"));
-        float scaleFactor = Gdx.graphics.getWidth()/ 1080f;
-        skin.getFont("title").getData();
+        float scaleFactor = Gdx.graphics.getWidth()/ 480f;
+        skin.getFont("font").getData().setScale(scaleFactor, scaleFactor);
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         im.addProcessor(stage);
@@ -673,9 +673,12 @@ public class PlayState extends State {
         tut1Dialog.getButtonTable().defaults().height(0.1f * Gdx.graphics.getHeight());
         tut1Dialog.getButtonTable().defaults().width(Gdx.graphics.getWidth());
         tut1Dialog.button("Press to Continue", 1L);
+        Label txt = new Label("Welcome to Roam Game! This is the loading room.\n\n" +
                 "Please walk forward through the exit to begin the game!\n\n" +
                 "To move, swipe on the screen in the direction you wish to travel.\n\n" +
                 "You can either continuously drag or swipe to move!", skin);
+        txt.setWrap(true);
+        tut1Dialog.getContentTable().add(txt).prefWidth(Gdx.graphics.getWidth()-25);
 
         tut2Dialog = new Dialog("\t  Tutorial Dialog", skin)
         {
