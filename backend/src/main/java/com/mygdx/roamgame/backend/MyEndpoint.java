@@ -65,10 +65,10 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "uploadEventData")
-    public void uploadEventData(@Named("gameID") int gameID, @Named("userName") String userName, @Named("timestamp") int timeStamp, @Named("levelNo") int levelNo, @Named("evenType") int evenType ,@Named("currentHealth") int currentHealth, @Named("currentScore") int currentScore, @Named("currentLevelScore") int currentLevelScore, @Named("barrelDecision") int barrelDecision, @Named("hazardType") int hazardType, @Named("distanceFromExit") int distanceFromExit, @Named("levelDuration") int levelDuration, @Named("closestZombieDistance") int closestZombieDistance, @Named("exitDistance") int exitDistance)  {
+    public void uploadEventData(@Named("gameID") int gameID, @Named("userName") String userName, @Named("timestamp") int timeStamp, @Named("levelNo") int levelNo, @Named("evenType") int evenType ,@Named("currentHealth") int currentHealth, @Named("currentScore") int currentScore, @Named("currentLevelScore") int currentLevelScore, @Named("barrelDecision") int barrelDecision, @Named("hazardType") int hazardType, @Named("distanceFromExit") int distanceFromExit, @Named("levelDuration") int levelDuration, @Named("closestZombieDistance") int closestZombieDistance, @Named("exitDistance") int exitDistance,  @Named("currentStreak") int currentStreak,  @Named("currentTimer") int currentTimer,  @Named("abilityType") int abilityType,  @Named("abilityActive") int abilityActive)  {
         //MyBean response = new MyBean();
 
-        EventInfoData eInfo = new EventInfoData((long)gameID, userName, (long)timeStamp, levelNo, evenType, (long)currentHealth, (long)currentScore, (long)currentLevelScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance);
+        EventInfoData eInfo = new EventInfoData((long)gameID, userName, (long)timeStamp, levelNo, evenType, (long)currentHealth, (long)currentScore, (long)currentLevelScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance, currentStreak, currentTimer, abilityType, abilityActive);
         // save to datastore
         ofy().save().entity(eInfo).now();
 

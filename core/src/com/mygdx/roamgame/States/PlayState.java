@@ -216,7 +216,7 @@ public class PlayState extends State {
     private boolean invincibleMode = false;
     private boolean reaperFreezeMode = false;
     private boolean reaperFastMode = false;
-    private boolean abilityActive = false;
+    private int abilityActive = 0;
     private float abilityBox_X;
     private float abilityBox_Y;
     private int numBoxes = 0;
@@ -568,7 +568,7 @@ public class PlayState extends State {
                 int selected = Integer.parseInt(object.toString());
 
                 // log event
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 1 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " " + String.valueOf(selected) + " 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 1 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " " + String.valueOf(selected) + " 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 "+String.valueOf(abilityActive)+"\n", true);
 
                 if (selected == 1)
                 {
@@ -1110,6 +1110,8 @@ public class PlayState extends State {
                     //abilityBoxPickedUp = true;
                     //abilityButton.setTexture(buttonTexture);
                     pickupAbilitySound.play(0.5f);
+                    // log event
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 4 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 "+String.valueOf(abilityActive)+"\n", true);
                     abilityBoxes.removeIndex(index);
                 }
                 //}
@@ -1194,7 +1196,7 @@ public class PlayState extends State {
                     dialogShowing = true;
                 }
 
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 2 0 0" + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 2 0 0" + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 " + String.valueOf(abilityActive)+"\n", true);
 
 
             }
@@ -1307,7 +1309,7 @@ public class PlayState extends State {
                     }
 
                     // log event
-                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 2 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 1 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 "+String.valueOf(abilityActive)+"\n", true);
 
                 }
 
@@ -1550,7 +1552,7 @@ public class PlayState extends State {
                 levelDuration = TimeUtils.millis() - levelStartTime;
 
                 // log info
-                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 3 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) +"\n", true);
+                handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 3 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 "+String.valueOf(abilityActive)+"\n", true);
 
                 // level up
                 levelCounter += 1;
@@ -1905,9 +1907,9 @@ public class PlayState extends State {
             if (Gdx.input.isTouched()) {
                 int pointX = Gdx.input.getX();
                 int pointY = Gdx.input.getY();
-                if ((numBoxes > 0) && (abilityActive == false) && abilityButton.checkIfClicked(pointX, Gdx.graphics.getHeight() - pointY))
+                if ((numBoxes > 0) && (abilityActive == 0) && abilityButton.checkIfClicked(pointX, Gdx.graphics.getHeight() - pointY))
                 {
-                    abilityActive = true;
+                    abilityActive = 1;
                     // choose an ability randomly
                     Random rand = new Random();
                     int mode = rand.nextInt(3);
@@ -1923,12 +1925,16 @@ public class PlayState extends State {
                         setZombieFreezeMode();
                     }
                     else if (mode == 2) {
+                        abilityActive = 2;
                         //update negative consequence
                         Random negRand = new Random();
                         int negOutcome = negRand.nextInt(3);
                         setNegOutCome(negOutcome);
                         //setZombieFastMode();
                     }
+
+                    // log event
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 5 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + String.valueOf(mode)+ " " +String.valueOf(abilityActive)+"\n", true);
                 }
             }
 
@@ -1987,7 +1993,7 @@ public class PlayState extends State {
                     @Override
                     public void run() {
                         //abilityBoxPickedUp = false;
-                        abilityActive = false;
+                        abilityActive = 0;
                         invincibleMode = false;
                         invincibilityMusic.stop();
 
@@ -2015,7 +2021,7 @@ public class PlayState extends State {
             @Override
             public void run() {
                 //abilityBoxPickedUp = false;
-                abilityActive = false;
+                abilityActive = 0;
                 reaperFastMode = false;
                 //reaperFastModeMusic.stop();
 
@@ -2049,7 +2055,7 @@ public class PlayState extends State {
             @Override
             public void run() {
                 //abilityBoxPickedUp = false;
-                abilityActive = false;
+                abilityActive = 0;
             }
         }, 5);
     }
@@ -2074,7 +2080,7 @@ public class PlayState extends State {
             @Override
             public void run() {
                 //abilityBoxPickedUp = false;
-                abilityActive = false;
+                abilityActive = 0;
                 reaperFreezeMode = false;
                 //reaperFreezeModeMusic.stop();
 

@@ -40,8 +40,16 @@ public class EventInfoData {
     public int closestZombieDistance;
     @Index
     public int exitDistance;
+    @Index
+    public int currentStreak;
+    @Index
+    public int currentTimer;
+    @Index
+    public int abilityType;
+    @Index
+    public int abilityActive;
 
-    public EventInfoData(Long gameId, String userName, Long t, int levelNo, int eT, Long cH, Long cS, Long cLS,  int bD, int hT, int dFE, int levelDuration, int closestZombieDistance, int exitDistance) {
+    public EventInfoData(Long gameId, String userName, Long t, int levelNo, int eT, Long cH, Long cS, Long cLS,  int bD, int hT, int dFE, int levelDuration, int closestZombieDistance, int exitDistance, int currentStreak, int currentTimer, int abilityType, int abilityActive) {
         this.gameId = gameId;
         this.userName = userName;
         this.timestamp = t;
@@ -56,6 +64,10 @@ public class EventInfoData {
         this.levelDuration = levelDuration;
         this.closestZombieDistance = closestZombieDistance;
         this.exitDistance = exitDistance;
+        this.currentStreak = currentStreak;
+        this.currentTimer = currentTimer;
+        this.abilityType = abilityType;
+        this.abilityActive = abilityActive;
     }
 
 }

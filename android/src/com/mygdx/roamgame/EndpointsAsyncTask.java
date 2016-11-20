@@ -116,9 +116,13 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                         int levelDuration = Integer.parseInt(entries[10]);
                         int closestZombieDistance = Integer.parseInt(entries[11]);
                         int exitDistance = Integer.parseInt(entries[12]);
+                        int currentStreak = Integer.parseInt(entries[13]);
+                        int currentTimer = Integer.parseInt(entries[14]);
+                        int abilityType = Integer.parseInt(entries[15]);
+                        int abilityActive = Integer.parseInt(entries[16]);
 
                         //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
-                        MenuActivity.myApiService.uploadEventData(gameID, userName,(int)timeStamp, levelNo, evenType, (int)cHealth, (int)cScore, (int)cLScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance).execute();
+                        MenuActivity.myApiService.uploadEventData(gameID, userName,(int)timeStamp, levelNo, evenType, (int)cHealth, (int)cScore, (int)cLScore, barrelDecision, hazardType, distanceFromExit, levelDuration, closestZombieDistance, exitDistance, currentStreak, currentTimer, abilityType, abilityActive).execute();
                     }
 
 
