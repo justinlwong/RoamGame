@@ -26,6 +26,7 @@ public class Zombie {
     private Texture zombie;
     private ZombieAnimation zombieAnimation;
     private Sound flap;
+    public int zType;
 
     private float speedmax = 90f;
     private boolean turboOn = false;
@@ -39,12 +40,15 @@ public class Zombie {
         oldPosition = new Vector3(x, y, 0);
         position = new Vector3(x, y, 0);
         speed = new Vector3(0, 0, 0);
-
+        zType = type;
 
         if (type == 1) {
             speedmax = 180f;
             zombie = new Texture("witch.png");
-        } else {
+        } else if (type == 2){
+            zombie = new Texture("zombie2.png");
+        }
+        else {
             zombie = new Texture("zombie.png");
         }
         zombieAnimation = new ZombieAnimation(new TextureRegion(zombie), 4, 1.0f);

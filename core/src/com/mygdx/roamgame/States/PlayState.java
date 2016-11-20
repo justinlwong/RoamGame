@@ -112,6 +112,7 @@ public class PlayState extends State {
     public static final int MAX_ZOMBIES = 25;
     private Array<Rectangle> zombiesBounds;
     private boolean abilityBoxPickedUp = false;
+    private int zombiePivot;
 
     // Textures
     AssetManager manager = new AssetManager();
@@ -353,6 +354,7 @@ public class PlayState extends State {
         redPoisonArr = new Array<PoisonObject>();
         foodSupplies = new Array<Rectangle>();
         abilityBoxes = new Array<Rectangle>();
+        zombiePivot = 6;
 
         spawnInitialBarrels();
 //        MovementGestureDetector mgd = new MovementGestureDetector(new MovementGestureDetector.DirectionListener() {
@@ -1289,7 +1291,12 @@ public class PlayState extends State {
             zombies.set(i, zombie);
             if(zombie.getBounds().overlaps(player.getBounds())) {
                 if ((invincibleMode == false) && (reaperFreezeMode == false) &&(TimeUtils.millis() - lastHitTime) > (int)(0.5f*(float)SEC)) {
-                    healthBarVal+=20;
+                    if (zombie.zType == 2) {
+                        healthBarVal+=40;
+                    }
+                    else {
+                        healthBarVal += 20;
+                    }
                     zombie.playSound();
                     lastHitTime = TimeUtils.millis();
 
@@ -1332,7 +1339,7 @@ public class PlayState extends State {
         }
 
         // Spawn new zombie every 2 seconds
-        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 9000 - levelCounter*1000))
+        if((TimeUtils.millis() - lastZombieSpawnTime) > Math.max(1000, 9000 - levelCounter*100))
             spawnZombie();
     }
 
@@ -1917,21 +1924,9 @@ public class PlayState extends State {
                     }
                     else if (mode == 2) {
                         //update negative consequence
-                        reaperFastModeMusic.play();
                         Random negRand = new Random();
                         int negOutcome = negRand.nextInt(3);
-                        if (negOutcome == 0){
-                            //lose health
-                            healthBarVal+=20;
-                        } else if (negOutcome == 1){
-                            //reduce timer
-                            if (curTimerVal > 10) {
-                                curTimerVal-=10;
-                            }
-                        } else if (negOutcome == 2) {
-                            //slow player
-                            player.slowPlayer();
-                        }
+                        setNegOutCome(negOutcome);
                         //setZombieFastMode();
                     }
                 }
@@ -2034,6 +2029,31 @@ public class PlayState extends State {
         }, 5);
     }
 
+    public void setNegOutCome(int mode)
+    {
+        reaperFastModeMusic.play();
+        if (mode == 0){
+            //lose health
+            healthBarVal+=20;
+        } else if (mode == 1){
+            //reduce timer
+            if (curTimerVal > 10) {
+                curTimerVal-=10;
+            }
+        } else if (mode == 2) {
+            //slow player
+            player.slowPlayer();
+        }
+        // last for 5 seconds
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                //abilityBoxPickedUp = false;
+                abilityActive = false;
+            }
+        }, 5);
+    }
+
     public void setZombieFreezeMode()
     {
         //abilityButton.setTexture(freezeButton);
@@ -2063,7 +2083,6 @@ public class PlayState extends State {
                 {
                     z.setFreezeOn(false);
                 }
-
             }
         }, 5);
     }
@@ -2145,6 +2164,17 @@ public class PlayState extends State {
             zombie.height = GRID_UNIT;
 
             Zombie newZombie = new Zombie(zombie.x, zombie.y, zombieDir, 0);
+            if (levelCounter >= 1) {
+                Random sRand = new Random();
+                int zTypeRand = sRand.nextInt(10);
+                if (zTypeRand >= zombiePivot) {
+                    newZombie = new Zombie(zombie.x, zombie.y, zombieDir, 2);
+                }
+                if (zombiePivot <= 0)
+                    zombiePivot = 0;
+                else
+                    zombiePivot-=2;
+            }
 
             boolean overlapped = false;
 
