@@ -476,6 +476,7 @@ public class PlayState extends State {
         skin = new Skin(Gdx.files.internal("star-soldier-ui.json"));
         float scaleFactor = Gdx.graphics.getWidth()/ 480f;
         skin.getFont("font").getData().setScale(scaleFactor, scaleFactor);
+
         //skin.add("default-font", bfont, BitmapFont.class);
         stage = new Stage();
         im.addProcessor(stage);
@@ -802,7 +803,7 @@ public class PlayState extends State {
             @Override
             public float getPrefHeight() {
                 // force dialog height
-                return 0.60f*Gdx.graphics.getHeight();
+                return 0.65f*Gdx.graphics.getHeight();
             }
             protected void result(Object object) {
 
@@ -819,7 +820,9 @@ public class PlayState extends State {
                 "1) ice: reapers freezing and being able to be destroyed for 5 seconds\n" +
                 "2) invincibility: invulnerability for 5 seconds\n\n" +
                 "The negative outcomes include:\n" +
-                "1) danger: reapers speed increasing for 5 seconds\n\n" +
+                "1) slow: player speed slows down for 5 seconds\n" +
+                "2) timer: timer is reduced by 10 seconds\n" +
+                "3) health: player health is reduced\n\n" +
                 "You can use the box any time, but use it wisely!", skin);
         txt6.setWrap(true);
         tut6Dialog.getContentTable().add(txt6).prefWidth(Gdx.graphics.getWidth()-25);
@@ -1910,9 +1913,26 @@ public class PlayState extends State {
                     if (mode == 0) {
                         setInvincibilityMode();
                     } else if (mode == 1) {
-                        setZombieFastMode();
-                    } else if (mode == 2) {
                         setZombieFreezeMode();
+                    }
+                    else if (mode == 2) {
+                        //update negative consequence
+                        reaperFastModeMusic.play();
+                        Random negRand = new Random();
+                        int negOutcome = negRand.nextInt(3);
+                        if (negOutcome == 0){
+                            //lose health
+                            healthBarVal+=20;
+                        } else if (negOutcome == 1){
+                            //reduce timer
+                            if (curTimerVal > 10) {
+                                curTimerVal-=10;
+                            }
+                        } else if (negOutcome == 2) {
+                            //slow player
+                            player.slowPlayer();
+                        }
+                        //setZombieFastMode();
                     }
                 }
             }
