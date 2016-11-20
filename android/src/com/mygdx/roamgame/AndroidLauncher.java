@@ -91,5 +91,15 @@ public class AndroidLauncher extends AndroidApplication {
 
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+
+
+		//RoamGame instance = new RoamGame();
+		initialize(new RoamGame(), config);
+	}
+
 
 }

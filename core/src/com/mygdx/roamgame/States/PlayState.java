@@ -295,6 +295,8 @@ public class PlayState extends State {
     protected PlayState(final GameStateManager gsm) {
         super(gsm);
 
+        //Gdx.input.setCatchBackKey(true);
+
         // file
         handle = Gdx.files.local("gameInfoLog.txt");
 
