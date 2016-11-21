@@ -132,8 +132,14 @@ public class PlayState extends State {
     Sprite invincibleButton;
     Sprite freezeButton;
     Sprite fastButton;
+    Sprite healthLossButton;
+    Sprite slowMotionButton;
+    Sprite timerLossButton;
     Texture questionMarkSmall;
     Texture xscreen;
+    Texture healthLossButtonTexture;
+    Texture slowMotionButtonTexture;
+    Texture timerLossButtonTexture;
 
     float diffX = 0;
     float diffY = 0;
@@ -216,6 +222,10 @@ public class PlayState extends State {
     private boolean invincibleMode = false;
     private boolean reaperFreezeMode = false;
     private boolean reaperFastMode = false;
+    private boolean playerSlowMode = false;
+    private boolean healthLossMode = false;
+    private boolean timerLossMode = false;
+
     private int abilityActive = 0;
     private float abilityBox_X;
     private float abilityBox_Y;
@@ -326,6 +336,9 @@ public class PlayState extends State {
         invincibleButtonTexture = new Texture("invincible.png");
         freezeButtonTexture  = new Texture("ice.png");
         fastButtonTexture  = new Texture("danger.png");
+        healthLossButtonTexture = new Texture("skull.png");
+        slowMotionButtonTexture = new Texture("slow.png");
+        timerLossButtonTexture = new Texture("timer.png");
 
         float SCALE_RATIO = 1080f / Gdx.graphics.getWidth();
 
@@ -346,6 +359,24 @@ public class PlayState extends State {
                 Texture.TextureFilter.Linear);
         fastButton.setSize(fastButton.getWidth() / SCALE_RATIO,
                 fastButton.getHeight() / SCALE_RATIO);
+
+        slowMotionButton = new Sprite(slowMotionButtonTexture);
+        slowMotionButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        slowMotionButton.setSize(slowMotionButton.getWidth() / SCALE_RATIO,
+                slowMotionButton.getHeight() / SCALE_RATIO);
+
+        timerLossButton = new Sprite(timerLossButtonTexture);
+        timerLossButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        timerLossButton.setSize(timerLossButton.getWidth() / SCALE_RATIO,
+                timerLossButton.getHeight() / SCALE_RATIO);
+
+        healthLossButton = new Sprite(healthLossButtonTexture);
+        healthLossButton.getTexture().setFilter(Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear);
+        healthLossButton.setSize(healthLossButton.getWidth() / SCALE_RATIO,
+                healthLossButton.getHeight() / SCALE_RATIO);
 
         abilityButton = new AbilityButton(buttonTexture);
         questionMarkSmall = new Texture("questionbox_small.png");
@@ -1953,6 +1984,18 @@ public class PlayState extends State {
         {
             fastButton.setPosition(0.03f*Gdx.graphics.getWidth(), 0.03f*Gdx.graphics.getHeight() );
             fastButton.draw(hb);
+        } else if (playerSlowMode)
+        {
+            slowMotionButton.setPosition(0.03f*Gdx.graphics.getWidth(), 0.03f*Gdx.graphics.getHeight() );
+            slowMotionButton.draw(hb);
+        } else if (healthLossMode)
+        {
+            healthLossButton.setPosition(0.03f*Gdx.graphics.getWidth(), 0.03f*Gdx.graphics.getHeight() );
+            healthLossButton.draw(hb);
+        } else if (timerLossMode)
+        {
+            timerLossButton.setPosition(0.03f*Gdx.graphics.getWidth(), 0.03f*Gdx.graphics.getHeight() );
+            timerLossButton.draw(hb);
         }
 
         //}
@@ -2042,15 +2085,18 @@ public class PlayState extends State {
         reaperFastModeMusic.play();
         if (mode == 0){
             //lose health
-            healthBarVal+=20;
+            healthBarVal+=50;
+            healthLossMode = true;
         } else if (mode == 1){
             //reduce timer
             if (curTimerVal > 10) {
                 curTimerVal-=10;
             }
+            timerLossMode = true;
         } else if (mode == 2) {
             //slow player
             player.slowPlayer();
+            playerSlowMode = true;
         }
         // last for 5 seconds
         Timer.schedule(new Timer.Task() {
@@ -2058,6 +2104,9 @@ public class PlayState extends State {
             public void run() {
                 //abilityBoxPickedUp = false;
                 abilityActive = 0;
+                healthLossMode = false;
+                playerSlowMode = false;
+                timerLossMode = false;
             }
         }, 5);
     }
