@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.roamgame.States.GameStateManager;
 import com.mygdx.roamgame.States.MenuState;
+import com.mygdx.roamgame.States.PlayState;
 import com.mygdx.roamgame.backend.myApi.MyApi;
 
 public class RoamGame extends ApplicationAdapter  {
@@ -50,7 +51,7 @@ public class RoamGame extends ApplicationAdapter  {
 		gsm = new GameStateManager();
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
-		gsm.push(new MenuState(gsm));
+		gsm.push(new PlayState(gsm));
 
 		//Gdx.input.setInputProcessor(this);
 		//Gdx.input.setCatchBackKey(true);

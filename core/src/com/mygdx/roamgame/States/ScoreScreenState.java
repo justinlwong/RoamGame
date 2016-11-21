@@ -32,10 +32,10 @@ public class ScoreScreenState extends State{
 
     @Override
     protected void handleInput() {
-        //if(Gdx.input.)
-        //{
-        //    gsm.set(new MenuState(gsm));
-       // }
+        if(Gdx.input.isTouched())
+        {
+            Gdx.app.exit();
+        }
 
     }
 

@@ -15,17 +15,33 @@
         android:text="Enter Profile Info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_centerInParent="true"
-        android:layout_weight="1"/>
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"/>
 
     <Button
         android:id="@+id/scoreScreenButton"
         android:text="High Scores"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_below="@+id/entireProfileButton"
         android:layout_centerInParent="true"
-        android:layout_weight="1"/>
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"/>
     <!--<Button-->
         <!--android:id="@+id/userGuideButton"-->
         <!--android:text="Roam Game User Guide"-->
@@ -39,9 +55,17 @@
         android:text="Start Game"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_below="@+id/scoreScreenButton"
         android:layout_centerInParent="true"
-        android:layout_weight="1"/>
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"/>
 
     <!--<Button-->
         <!--android:layout_width="fill_parent"-->

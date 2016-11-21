@@ -62,7 +62,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
         //System.out.println("available: " + String.valueOf(Gdx.files.isLocalStorageAvailable()));
         //Environment.get
         //Environment.get
-        String returnStr;
+        String returnStr = "Welcome back!";
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
@@ -100,6 +100,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                         //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                         //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
                         MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
+                        returnStr = "Added "+userName+"'s entry to datastore!";
                     } else if (entries[0].compareTo("event") == 0) {
 
 
@@ -132,7 +133,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
 
             }
 
-            returnStr = "Added "+userName+"'s entry to datastore!";
+
             br.close();
             if(file.delete()){
                 System.out.println(file.getName() + " is deleted!");
