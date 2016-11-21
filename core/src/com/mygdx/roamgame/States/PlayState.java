@@ -189,6 +189,7 @@ public class PlayState extends State {
     // Dialog
     Dialog barrelChooseDialog;
     Dialog endLevelDialog;
+    Dialog exitDialog;
     Skin skin;
     Stage stage;
     private boolean dialogShowing;
@@ -295,7 +296,7 @@ public class PlayState extends State {
     protected PlayState(final GameStateManager gsm) {
         super(gsm);
 
-        //Gdx.input.setCatchBackKey(true);
+        Gdx.input.setCatchBackKey(true);
 
         // file
         handle = Gdx.files.local("gameInfoLog.txt");
@@ -491,6 +492,35 @@ public class PlayState extends State {
         // UI
         bloodScreen = new Rectangle(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         srender = new ShapeRenderer();
+
+        exitDialog = new Dialog("\t Leave Game? ", skin)
+        {
+            @Override
+            public float getPrefWidth() {
+                // force dialog width
+                return Gdx.graphics.getWidth();
+            }
+
+            @Override
+            public float getPrefHeight() {
+                // force dialog height
+                return 0.65f*Gdx.graphics.getHeight();
+            }
+            protected void result(Object object) {
+
+                int selected = Integer.parseInt(object.toString());
+
+                if (selected == 1 )
+                {
+                    Gdx.app.exit();
+                }
+
+                //endDialogShowing = false;
+            }
+        };
+
+        exitDialog.button("Yes", 1L);
+        exitDialog.button("Continue", 2L);
 
         endLevelDialog = new Dialog("\t End Level Dialog ", skin)
         {
@@ -861,6 +891,11 @@ public class PlayState extends State {
         //String logData = String.valueOf(TimeUtils.nanoTime() - gameStartTime) + " " ;
         //boolean isMoved = false;
         isTouched = false;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.BACK))
+        {
+            exitDialog.show(stage);
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             //logData += "Up";
