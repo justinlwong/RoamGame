@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -75,6 +76,8 @@ public class PlayState extends State {
     private int levelCounter = 0;
     private long lastBarrelScore;
     private long lastHealthAdded;
+    private boolean abilityAnimation;
+    private long abilityAnimationStart;
     private boolean scoreAnimation;
     private long scoreAnimationStart;
     private long healthAnimationStart;
@@ -178,8 +181,10 @@ public class PlayState extends State {
     // Fonts
     BitmapFont font;
     private BitmapFont bfont;
+    private BitmapFont bfont_small;
     private FreeTypeFontGenerator generator;
     private FreeTypeFontGenerator.FreeTypeFontParameter parameter;
+    private GlyphLayout layout;
 
     private Random zRand;
     public static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
@@ -480,10 +485,16 @@ public class PlayState extends State {
         float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
         generator = new FreeTypeFontGenerator(Gdx.files.internal("bebas.ttf"));
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        layout = new GlyphLayout();
 
         parameter.size = (int)(screenScale*( 30 ));//+ (int)((1f - alpha)*20f)));
+        parameter.borderColor = Color.BLACK;
+        parameter.borderWidth = 2;
         //parameter.characters = "0123456789+-Gained!*pointshealthEnteringLevelCongratsReceivebonus ";
         bfont = generator.generateFont(parameter);
+        parameter.size = (int) (screenScale*(20));
+        parameter.borderWidth = 1;
+        bfont_small = generator.generateFont(parameter);
         generator.dispose();
         //System.out.println("space " + bfont.getSpaceWidth());
 
@@ -1878,12 +1889,12 @@ public class PlayState extends State {
 
         hb.begin();
         //Draw health bar
-        Vector3 positionBar = new Vector3(0.20f*Gdx.graphics.getWidth(), 0.96f*Gdx.graphics.getHeight(), 0);
+        Vector3 positionBar = new Vector3(0.04f*Gdx.graphics.getWidth(), 0.96f*Gdx.graphics.getHeight(), 0);
 
         NinePatch frontBar= new NinePatch(fb, 8, 8, 8, 8);
         NinePatch backBar = new NinePatch(bb, 8, 8, 8, 8);
 
-        float fullBar = 0.75f*Gdx.graphics.getWidth();
+        float fullBar = 0.92f*Gdx.graphics.getWidth();
 
         backBar.draw(hb, positionBar.x, positionBar.y, fullBar, 0.03f*Gdx.graphics.getHeight());
         float fbVal = (maxHealthLosable-healthBarVal)*fullBar/(maxHealthLosable);
@@ -1896,19 +1907,19 @@ public class PlayState extends State {
             Gdx.app.log("resumed in hud", player.getPosition().x + " " + player.getPosition().y);
 
         }
-        Vector3 positionScore = new Vector3(0.03f*Gdx.graphics.getWidth(),0.9625f*Gdx.graphics.getHeight(), 0);
-        font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //font.draw(hb, "Score : " + String.valueOf(score), positionScore.x, positionScore.y);
-        Label.LabelStyle textStyle;
-        Label text;
-        textStyle = new Label.LabelStyle();
-        textStyle.font = font;
-        text = new Label("Score : " + String.valueOf(score), textStyle);
-        float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
-        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
-        text.setFontScale(screenScale, screenScale);
-        text.setPosition(positionScore.x, positionScore.y);
-        text.draw(hb, 2f);
+//        Vector3 positionScore = new Vector3(0.03f*Gdx.graphics.getWidth(),0.9625f*Gdx.graphics.getHeight(), 0);
+//        font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+//        //font.draw(hb, "Score : " + String.valueOf(score), positionScore.x, positionScore.y);
+//        Label.LabelStyle textStyle;
+//        Label text;
+//        textStyle = new Label.LabelStyle();
+//        textStyle.font = font;
+//        text = new Label("Score : " + String.valueOf(score), textStyle);
+//        float screenScale = 1f*Gdx.graphics.getWidth()/(RoamGame.WIDTH);
+//        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
+//        text.setFontScale(screenScale, screenScale);
+//        text.setPosition(positionScore.x, positionScore.y);
+//        text.draw(hb, 2f);
 
         //update timer
         if((curTimerVal <= 0 ) && (location == 1)){
@@ -1940,11 +1951,14 @@ public class PlayState extends State {
         } else {
             bfont.setColor(new Color(255, 255, 0, 1));
         }
-        bfont.draw(hb, "Timer : " + String.valueOf(curTimerVal), Gdx.graphics.getWidth()/2-(bfont.getSpaceWidth()*9), 0.92f*Gdx.graphics.getHeight());
+        String timerText = "Timer : " + String.valueOf(curTimerVal);
+        layout.setText(bfont,  timerText);
+        float twidth = layout.width;
+        bfont.draw(hb, "Timer : " + String.valueOf(curTimerVal), (Gdx.graphics.getWidth() - 0.03f*Gdx.graphics.getHeight()) - (twidth), 0.94f*Gdx.graphics.getHeight());
 
-        Label textTolerance;
-        textStyle = new Label.LabelStyle();
-        textStyle.font = font;
+//        Label textTolerance;
+//        textStyle = new Label.LabelStyle();
+//        textStyle.font = font;
         if (resumeFlag == true)
         {
             Gdx.app.log("resumed in hud2", player.getPosition().x + " " + player.getPosition().y);
@@ -1973,10 +1987,56 @@ public class PlayState extends State {
             float alpha = (1f - ((float)(TimeUtils.millis() - healthAnimationStart)/5000f));
 
             bfont.setColor(new Color(255, 255, 255, alpha));
-            bfont.draw(hb, "+ "+lastHealthAdded + " health!", Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+            String healthText = "+ "+lastHealthAdded + " health!";
+            layout.setText(bfont, healthText);
+            float width = layout.width;
+            bfont.draw(hb, healthText, (Gdx.graphics.getWidth() / 2) - (width/2), Gdx.graphics.getHeight() / 2);
             if (TimeUtils.millis() - healthAnimationStart > 5000 )
             {
                 healthAnimation = false;
+            }
+        }
+
+        if (abilityAnimation)
+        {
+
+            float alpha = (1f - ((float)(TimeUtils.millis() - abilityAnimationStart)/3000f));
+
+            if (reaperFreezeMode)
+            {
+                bfont.setColor(new Color(0, 255,0, alpha));
+                layout.setText(bfont, "Freeze!");
+                float width = layout.width;
+
+                bfont.draw(hb, "Freeze!", (Gdx.graphics.getWidth() / 2) - (width/2), 0.4f*Gdx.graphics.getHeight() );
+            } else if (playerSlowMode)
+            {
+                bfont.setColor(new Color(255, 0, 0, alpha));
+                layout.setText(bfont, "Slowed!");
+                float width = layout.width;
+                bfont.draw(hb, "Slowed!", (Gdx.graphics.getWidth() / 2) - (width/2), 0.4f*Gdx.graphics.getHeight() );
+            } else if (invincibleMode)
+            {
+                bfont.setColor(new Color(0, 255,0, alpha));
+                layout.setText(bfont, "Can't touch this!");
+                float width = layout.width;
+                bfont.draw(hb, "Can't touch this!", (Gdx.graphics.getWidth() / 2) - (width/2), 0.4f*Gdx.graphics.getHeight());
+            } else if (timerLossMode)
+            {
+                bfont.setColor(new Color(255, 0, 0, alpha));
+                layout.setText(bfont, "- 5 seconds");
+                float width = layout.width;
+                bfont.draw(hb, "- 5 seconds", (Gdx.graphics.getWidth() / 2) - (width/2), 0.4f*Gdx.graphics.getHeight());
+            } else if (healthLossMode)
+            {
+                bfont.setColor(new Color(255, 0, 0, alpha));
+                layout.setText(bfont, "- 25% Health!");
+                float width = layout.width;
+                bfont.draw(hb, "- 25% Health!", (Gdx.graphics.getWidth() / 2) - (width/2), 0.4f*Gdx.graphics.getHeight());
+            }
+            if (TimeUtils.millis() - abilityAnimationStart > 3000 )
+            {
+                abilityAnimation = false;
             }
         }
 
@@ -1985,7 +2045,10 @@ public class PlayState extends State {
             float alpha = (1f - ((float)(TimeUtils.millis() - 500 - levelAnimationStart)/2500f));
             if ((TimeUtils.millis() - levelAnimationStart > 500) ) {
                 bfont.setColor(new Color(255, 255, 255, alpha));
-                bfont.draw(hb, "Entering   Level   " + (levelCounter + 1) + "!", (int)(0.35f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
+                String lText = "Entering   Level   " + (levelCounter + 1) + "!";
+                layout.setText(bfont, lText);
+                float width = layout.width;
+                bfont.draw(hb, lText, (Gdx.graphics.getWidth() / 2) - (width/2) , Gdx.graphics.getHeight() / 3);
             }
             if ((TimeUtils.millis() - levelAnimationStart > 3000) )
             {
@@ -1998,7 +2061,10 @@ public class PlayState extends State {
             float alpha = (1f - ((float)(TimeUtils.millis() - 500 - endLevelAnimationStart)/2500f));
             if ((TimeUtils.millis() - endLevelAnimationStart > 500) ) {
                 bfont.setColor(new Color(255, 255, 0, alpha));
-                bfont.draw(hb, "Congrats!   Received   " + lastLevelScore + "   points!", (int)(0.10f*(float)Gdx.graphics.getWidth()) , Gdx.graphics.getHeight() / 3);
+                String eText = "Congrats!   Received   " + lastLevelScore + "   points!";
+                layout.setText(bfont, eText);
+                float width = layout.width;
+                bfont.draw(hb, eText, (Gdx.graphics.getWidth() / 2) - (width/2) , Gdx.graphics.getHeight() / 3);
             }
             if ((TimeUtils.millis() - endLevelAnimationStart > 3000) )
             {
@@ -2016,21 +2082,34 @@ public class PlayState extends State {
             Gdx.app.log("resumed in hud3", player.getPosition().x + " " + player.getPosition().y);
 
         }
+
+        bfont_small.setColor(new Color(255, 255, 255, 1));
+        String sText = "Score : " + score;
+
+        bfont_small.draw(hb, sText, 0.03f*Gdx.graphics.getHeight() , 0.94f*Gdx.graphics.getHeight());
+        sText = "Level Score : " + levelScore;
+
+        bfont_small.draw(hb, sText, 0.03f*Gdx.graphics.getHeight() , 0.90f*Gdx.graphics.getHeight());
+
+        sText = "Streak : " + barrelStreak;
+
+        bfont_small.draw(hb, sText, 0.03f*Gdx.graphics.getHeight(), 0.86f*Gdx.graphics.getHeight());
+
 //        textTolerance = new Label("Current Health: " + String.valueOf((int)(100*(1 - (healthBarVal/maxHealthLosable)))) , textStyle);
 
-        textTolerance = new Label("Level " + String.valueOf(levelCounter+1) + " Score: " + String.valueOf(levelScore) , textStyle);
-        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
-        textTolerance.setFontScale(screenScale, screenScale);
-        textTolerance.setPosition(positionScore.x, positionScore.y - 0.03f * Gdx.graphics.getHeight());
-
-        textTolerance.draw(hb, 2f);
-
-        textTolerance = new Label("Streak: " + String.valueOf(barrelStreak) , textStyle);
-        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
-        textTolerance.setFontScale(screenScale, screenScale);
-        textTolerance.setPosition(positionScore.x, positionScore.y - 0.06f * Gdx.graphics.getHeight());
-
-        textTolerance.draw(hb, 2f);
+//        textTolerance = new Label("Level " + String.valueOf(levelCounter+1) + " Score: " + String.valueOf(levelScore) , textStyle);
+//        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
+//        textTolerance.setFontScale(screenScale, screenScale);
+//        textTolerance.setPosition(positionScore.x, positionScore.y - 0.03f * Gdx.graphics.getHeight());
+//
+//        textTolerance.draw(hb, 2f);
+//
+//        textTolerance = new Label("Streak: " + String.valueOf(barrelStreak) , textStyle);
+//        //System.out.println(RoamGame.WIDTH + " " + Gdx.graphics.getWidth());
+//        textTolerance.setFontScale(screenScale, screenScale);
+//        textTolerance.setPosition(positionScore.x, positionScore.y - 0.06f * Gdx.graphics.getHeight());
+//
+//        textTolerance.draw(hb, 2f);
 
         if (resumeFlag == true)
         {
@@ -2095,6 +2174,10 @@ public class PlayState extends State {
                         setNegOutCome(negOutcome);
                         //setZombieFastMode();
                     }
+
+                    abilityAnimationStart = TimeUtils.millis();
+                    abilityAnimation = true;
+                    scoreAnimation = false;
 
                     // log event
                     handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 5 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 0" +  " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + String.valueOf(mode)+ " " +String.valueOf(abilityActive)+"\n", true);
@@ -2219,9 +2302,9 @@ public class PlayState extends State {
             healthLossMode = true;
         } else if (mode == 1){
             //reduce timer
-            if (curTimerVal > 10) {
-                curTimerVal-=10;
-            }
+            //if (curTimerVal > 5) {
+                curTimerVal-=5;
+            //}
             timerLossMode = true;
         } else if (mode == 2) {
             //slow player
