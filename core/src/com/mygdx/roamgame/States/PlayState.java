@@ -335,8 +335,8 @@ public class PlayState extends State {
         lastHitTime = 0;
         lastPoisonedTime = 0;
         maxTimerVal = 48;
-        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
-        subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
+        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3, 2f);
+        subMaze = new Environment("roguelike-pack/Map/submaze_snow_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2, 1f);
 
         person = new Texture("steverogers.png");
         gooTexture = new Texture ("steverogers_goo.png");
@@ -467,8 +467,8 @@ public class PlayState extends State {
         //handle.writeString("Hello!", true);
         // environments
 
-        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3);
-        subMaze = new Environment("roguelike-pack/Map/submaze_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
+        startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, 4, 1, 2, 3, 8, 3, 2f);
+        subMaze = new Environment("roguelike-pack/Map/submaze_snow_0.tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2, 1f);
         // camera related info
         cam.setToOrtho(false, RoamGame.WIDTH*3/4, RoamGame.HEIGHT*3/4);
 
@@ -1749,8 +1749,14 @@ public class PlayState extends State {
                 System.out.println("Reached Level " + String.valueOf(levelCounter));
 
                 // load new map and reset grid
-
-                subMaze = new Environment("roguelike-pack/Map/submaze_" + String.valueOf(levelCounter % 7) + ".tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2);
+                int settingType = levelCounter % 3;
+                int iteration = (levelCounter / 3)%3;
+                String prefix = "snow";
+                if (settingType == 1)
+                    prefix = "desert";
+                else if (settingType == 2)
+                    prefix = "mars";
+                subMaze = new Environment("roguelike-pack/Map/submaze_" + prefix+"_"+String.valueOf(iteration) + ".tmx", GRID_UNIT, 10, 1, 1, 10, 21, 2, 1f);
 
                 foodSupplies = new Array<Rectangle>();
                 abilityBoxes = new Array<Rectangle>();

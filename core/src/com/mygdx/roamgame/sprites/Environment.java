@@ -36,7 +36,7 @@ public class Environment {
     // Obstacles
     public Array<Rectangle> obstacles;
 
-    public Environment (String mapName, int grid_unit, int startX, int startY, int barrierLayerNo, int exitX, int exitY, int exitWidth)
+    public Environment (String mapName, int grid_unit, int startX, int startY, int barrierLayerNo, int exitX, int exitY, int exitWidth, float zoom)
     {
 
         gridUnit = grid_unit;
@@ -44,7 +44,7 @@ public class Environment {
         startingPosY = startY*grid_unit;
 
         map = new TmxMapLoader().load(mapName);
-        renderer = new OrthogonalTiledMapRenderer(map, 2f);
+        renderer = new OrthogonalTiledMapRenderer(map, zoom);
 
         barrierLayerNum = barrierLayerNo;
 
