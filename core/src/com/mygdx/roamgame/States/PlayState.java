@@ -58,6 +58,7 @@ public class PlayState extends State {
 
     public static final int SPRITE_SPACING = 16;
     public static final int GRID_UNIT = 32;
+    public static final int VERSION = 1;
 
     // Environments
     private Environment startRoom;
@@ -319,7 +320,7 @@ public class PlayState extends State {
         Gdx.input.setCatchBackKey(true);
 
         // file
-        handle = Gdx.files.local("gameInfoLog.txt");
+        handle = Gdx.files.local("gameInfoLog_temp.txt");
 
         // state related info
         score = 0;
@@ -608,6 +609,8 @@ public class PlayState extends State {
 
 
                     handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
+                    FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
+                    Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
                     gsm.set(new ScoreScreenState(gsm));
                 }
 
@@ -1617,6 +1620,8 @@ public class PlayState extends State {
             String strDate = sdfDate.format(now);
 
             handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
+            FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
+            Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));
         }
     }
@@ -1945,6 +1950,8 @@ public class PlayState extends State {
 
 
             handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
+            FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
+            Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));
         } else if((curTimerVal < 20) && (location == 1)) {
             bfont.setColor(255,0,0,1);
