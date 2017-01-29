@@ -58,7 +58,7 @@ public class PlayState extends State {
 
     public static final int SPRITE_SPACING = 16;
     public static final int GRID_UNIT = 32;
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     // Environments
     private Environment startRoom;

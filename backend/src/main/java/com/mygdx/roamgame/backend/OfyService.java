@@ -15,6 +15,8 @@ public class OfyService {
     static {
         ObjectifyService.register(GameInfoData.class);
         ObjectifyService.register(EventInfoData.class);
+        ObjectifyService.register(GameIDData.class);
+        ObjectifyService.register(RegisteredUserIDData.class);
     }
     public static Objectify ofy() {
         return ObjectifyService.ofy();

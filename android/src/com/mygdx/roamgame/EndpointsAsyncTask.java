@@ -31,7 +31,7 @@ import java.util.Random;
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     //private static MyApi myApiService = null;
     private Context context;
-    public static int VERSION = 1;
+    public static int VERSION = 2;
 
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
@@ -85,8 +85,8 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                 String userName = MenuActivity.userDB.getUserName();
                 if (userName == null)
                     userName = "JohnDoe";
-                Random rand = new Random();
-                int gameID = rand.nextInt(99999) + 1;
+                //Random rand = new Random();
+                int gameID = MenuActivity.myApiService.getNewID().execute().getIddata();
                 while (log != null) {
                     String[] entries = log.split(" ");
                     System.out.println(String.valueOf(entries.length));
@@ -102,6 +102,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                             MenuActivity.userDB.insertScore(timestamp, userName, (int) score);
                             //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                             //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
+
                             MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
                             returnStr = "Added " + userName + "'s entry to datastore!";
                         } else if (entries[0].compareTo("event") == 0) {
@@ -154,17 +155,18 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
         }
 
 
-        try {
-            return MenuActivity.myApiService.sayHi(name).execute().getData();
-        } catch (IOException e) {
-            return e.getMessage();
-       }
+        //try {
+            return "";//MenuActivity.myApiService.sayHi(name).execute().getData();
+        //} catch (IOException e) {
+        //    return e.getMessage();
+       //}
 
     }
 
     @Override
     protected void onPostExecute(String result) {
         System.out.println("toast print");
-        Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+        if (!result.equals(""))
+            Toast.makeText(context, result, Toast.LENGTH_LONG).show();
     }
 }

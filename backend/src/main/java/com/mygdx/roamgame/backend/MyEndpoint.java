@@ -46,8 +46,6 @@ public class MyEndpoint {
         // save to datastore
         //ofy().save().entity(gInfo).now();
 
-
-
         return response;
     }
 
@@ -58,8 +56,6 @@ public class MyEndpoint {
         GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency, timestamp);
         // save to datastore
         ofy().save().entity(gInfo).now();
-
-
 
         //return response;
     }
@@ -88,6 +84,60 @@ public class MyEndpoint {
 
 
 
+    }
+
+    @ApiMethod(name ="verifyID")
+    public MyBean verifyID(@Named("checkID") int checkID)
+    {
+        Query<RegisteredUserIDData> rInfo = ofy().load().type(RegisteredUserIDData.class).filter("userID", checkID);
+
+        RegisteredUserIDData res = rInfo.first().now();
+        MyBean response = new MyBean();
+        if (res!= null)
+        {
+            response.setUserID(res.getUserID());
+            response.setData("Verified ID! You can now enter the game!");
+        } else
+        {
+            response.setData("The submitted ID was incorrect! Please try again!");
+            response.setUserID(-1);
+        }
+        return response;
+
+    }
+
+    @ApiMethod(name = "registerID")
+    public void registerID(@Named("registeredID")int registeredID)
+    {
+        RegisteredUserIDData rID = new RegisteredUserIDData();
+        rID.setUserID(registeredID);
+        ofy().save().entity(rID).now();
+    }
+
+    @ApiMethod(name = "createIDGenerator")
+    public void createIDGenerator(@Named("initialVal")int initialVal)
+    {
+        GameIDData gInfo = new GameIDData(initialVal);
+
+        ofy().save().entity(gInfo).now();
+    }
+
+    @ApiMethod(name = "getNewID")
+    public MyBean getNewID()
+    {
+        Query<GameIDData> gInfo = ofy().load().type(GameIDData.class);
+
+        GameIDData entry = gInfo.first().now();
+        int newID = entry.getID();
+
+        MyBean response = new MyBean();
+        response.setIDData(newID);
+
+        // update
+        entry.incrementID();
+        ofy().save().entity(entry).now();
+
+        return response;
     }
 
 }

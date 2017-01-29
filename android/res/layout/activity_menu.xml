@@ -12,7 +12,7 @@
 
     <Button
         android:id="@+id/entireProfileButton"
-        android:text="Enter Profile Info"
+        android:text="Verify ID"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="280dp"
