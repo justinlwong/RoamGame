@@ -117,7 +117,9 @@ public class MyEndpoint {
     @ApiMethod(name = "createIDGenerator")
     public void createIDGenerator(@Named("initialVal")int initialVal)
     {
-        GameIDData gInfo = new GameIDData(initialVal);
+        GameIDData gInfo = new GameIDData();
+
+        gInfo.setID(initialVal);
 
         ofy().save().entity(gInfo).now();
     }

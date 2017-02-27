@@ -16,14 +16,15 @@ public class GameIDData {
     public int gameID;
 
 
-    public GameIDData(int id) {
-        gameID = id;
+    public GameIDData() {
 
     }
 
     public int getID() {
         return gameID;
     }
+
+    public void setID(int id) {gameID = id;}
 
     public void incrementID() {
         gameID = gameID + 1;

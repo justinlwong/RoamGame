@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/et_uname"
-        android:inputType="textCapWords"
+        android:inputType="number"
         android:maxLength="15"
         android:layout_below="@id/uNameText"
         android:textColor="@color/white"

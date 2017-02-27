@@ -38,7 +38,7 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
             progDailog.setMessage("Verifying...");
             progDailog.setIndeterminate(false);
             progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            //progDailog.setCancelable(true);
+            progDailog.setCancelable(false);
             progDailog.show();
         }
 
