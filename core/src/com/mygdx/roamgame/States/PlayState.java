@@ -45,6 +45,7 @@ import com.mygdx.roamgame.sprites.Zombie;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 
@@ -53,6 +54,15 @@ import java.util.Random;
  */
 
 public class PlayState extends State {
+
+    class Node {
+        public int x;
+        public int y;
+        public Node parent;
+        public int G;
+        public int H;
+        List<Node> children;
+    }
 
     InputMultiplexer im = new InputMultiplexer();
 
@@ -1628,6 +1638,8 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
+
+
         if (!dialogShowing && !endDialogShowing) {
             handleInput();
             player.update(dt);
@@ -1637,6 +1649,9 @@ public class PlayState extends State {
             }
             // make sure this is called after player update
             checkPlayerBounds();
+
+            System.out.println(subMaze.occupiedGrid[((int)(player.centerX)/GRID_UNIT)][(int)(player.centerY/GRID_UNIT)]);
+
             if (resumeFlag == true)
             {
                 Gdx.app.log("resumed after check bounds", player.getPosition().x + " " + player.getPosition().y);

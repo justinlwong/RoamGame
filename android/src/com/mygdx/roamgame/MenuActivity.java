@@ -93,6 +93,7 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
                 Toast.makeText(context, "Invalid ID! Please try again!", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(context, "Verified " + String.valueOf(result) + "!", Toast.LENGTH_LONG).show();
+                MenuActivity.userDB.insertProfile( String.valueOf(result), "", "", "", 0);
                 showButton();
 
             }

@@ -67,6 +67,9 @@ public class Player {
     private float boostfactor;
     private boolean resumeFlag = false;
 
+    public float centerX;
+    public float centerY;
+
 
     public Player(int x, int y, int height, int width, Texture person, Texture goo)
     {
@@ -83,6 +86,9 @@ public class Player {
         st = state.standby;
 
         loadTextures(person, goo);
+
+        centerX = x + 3 + texture.getWidth()/12;
+        centerY = y + 3 + texture.getHeight()/24;
 
         bounds = new Rectangle(x+3, y+3, texture.getWidth()/6, texture.getHeight()/12);
         curDir = dir.up;
