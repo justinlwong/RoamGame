@@ -22,6 +22,7 @@ public class Environment {
     public TiledMapRenderer renderer;
 
     public int[][] occupiedGrid;
+    public int[][] heatgrid;
 
     private int startingPosX;
     private int startingPosY;
@@ -36,9 +37,9 @@ public class Environment {
     // Obstacles
     public Array<Rectangle> obstacles;
 
-    public Environment (String mapName, int grid_unit, int startX, int startY, int barrierLayerNo, int exitX, int exitY, int exitWidth, float zoom)
+    public Environment (String mapName, int grid_unit, int [][] heatmap, int startX, int startY, int barrierLayerNo, int exitX, int exitY, int exitWidth, float zoom)
     {
-
+        heatgrid = heatmap;
         gridUnit = grid_unit;
         startingPosX = startX*grid_unit;
         startingPosY = startY*grid_unit;

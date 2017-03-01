@@ -232,6 +232,9 @@ public class Player {
             resumeFlag = false;
         }
 
+        centerX = position.x + 3 + texture.getWidth()/12;
+        centerY = position.y + 3 + texture.getHeight()/24;
+
         //Gdx.app.log("position ",  position.x + " " + position.y);
     }
 
