@@ -98,13 +98,14 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                             int inputFrequency = Integer.parseInt(entries[3]);
                             String timestamp = (entries[4]);
                             int isDemo = Integer.parseInt(entries[5]);
+                            String compl = (entries[6]);
                             System.out.println("Score: " + String.valueOf(score));
 
                             MenuActivity.userDB.insertScore(timestamp, userName, (int) score);
                             //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                             //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
 
-                            MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp, isDemo).execute();
+                            MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp, isDemo, compl).execute();
                             returnStr = "Added " + userName + "'s entry to datastore!";
                         } else if (entries[0].compareTo("event") == 0) {
 

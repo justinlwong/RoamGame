@@ -24,8 +24,10 @@ public class GameInfoData {
     public String timestamp;
     @Index
     public int isDemo;
+    @Index
+    public String compl;
 
-    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf, String ts, int isD) {
+    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf, String ts, int isD, String comp) {
         id = gameID;
         user = u;
         score = s;
@@ -33,6 +35,7 @@ public class GameInfoData {
         inputFrequency = inputf;
         timestamp = ts;
         isDemo = isD;
+        compl = comp;
     }
 
 }

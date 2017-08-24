@@ -43,6 +43,7 @@ import com.mygdx.roamgame.sprites.Zombie;
 
 
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -76,6 +77,7 @@ public class PlayState extends State {
 
     // game state info
     private String movementLog;
+    private int lastNewDirection;
     private boolean isDemo;
     private int score;
     public int healthBarVal;
@@ -709,7 +711,8 @@ public class PlayState extends State {
 
     public void initTextures()
     {
-
+        lastNewDirection = 0;
+        movementLog = "";
         //handle.writeString("Hello!", true);
         // environments
 
@@ -821,8 +824,8 @@ public class PlayState extends State {
                     Date now = new Date();
                     String strDate = sdfDate.format(now);
 
-
-                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+"\n", true);
+                    String compl = computeComplexity();
+                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+ " " + compl + "\n", true);
                     FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
                     Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
                     gsm.set(new ScoreScreenState(gsm));
@@ -1298,24 +1301,55 @@ public class PlayState extends State {
             player.moveUp();
             inputRegistered += 1;
             isTouched = true;
+
+            if (lastNewDirection != 1)
+            {
+                lastNewDirection = 1;
+                movementLog += "00";
+                //System.out.println(movementLog);
+            }
             //isMoved = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
             //logData += "Down";
             player.moveDown();
             inputRegistered += 1;
             isTouched = true;
+
+
+            if (lastNewDirection != 2)
+            {
+                lastNewDirection = 2;
+                movementLog += "01";
+                //System.out.println(movementLog);
+            }
             //isMoved = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             //logData += "Left";
             player.moveLeft();
             inputRegistered += 1;
             isTouched = true;
+
+
+            if (lastNewDirection != 3)
+            {
+                lastNewDirection = 3;
+                movementLog += "10";
+                //System.out.println(movementLog);
+            }
             //isMoved = true;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             //logData += "Right";
             player.moveRight();
             inputRegistered += 1;
             isTouched = true;
+
+
+            if (lastNewDirection != 4)
+            {
+                lastNewDirection = 4;
+                movementLog += "11";
+                //System.out.println(movementLog);
+            }
             //isMoved = true;
         }
 
@@ -1373,30 +1407,40 @@ public class PlayState extends State {
             }
 
             int dir = getPopularElement(direction_filter);
+            String curDir = "";
 
             if(dir == 1)
             {
                 //movementLog += "00";
                 player.moveRight();
                 player.keepMoving(Player.dir.right);
+                curDir = "00";
             } else if (dir == 2)
             {
                 //movementLog += "01";
                 player.moveLeft();
                 player.keepMoving(Player.dir.left);
+                curDir = "01";
             } else if (dir == 3)
             {
                 //movementLog += "10";
                 player.moveDown();
                 player.keepMoving(Player.dir.down);
+                curDir = "10";
             } else if (dir == 4)
             {
                 //movementLog += "11";
                 player.moveUp();
                 player.keepMoving(Player.dir.up);
+                curDir = "11";
             }
 
+            if (lastNewDirection != dir)
+            {
+                lastNewDirection = dir;
 
+                movementLog += curDir;
+            }
 
 
             // }
@@ -1435,6 +1479,70 @@ public class PlayState extends State {
         //if (isMoved == true)
         //    logFile.writeString(logData, true);
 
+    }
+
+    public String computeComplexity()
+    {
+        int n = movementLog.length();
+        int c = 1;
+        int l = 1;
+
+        int i = 0;
+        int k = 1;
+        int k_max = 1;
+        int stop = 0;
+        double b;
+        double complexity;
+        System.out.println("length of string:" + String.valueOf(n));
+
+        while (stop == 0)
+        {
+            //System.out.println("analyzing");
+            if (movementLog.charAt(i+k) != movementLog.charAt(l+k))
+            {
+                if (k > k_max)
+                    k_max = k;
+                i = i + 1;
+
+                if (i==1)
+                {
+                    c = c+1;
+                    l = l+k_max;
+                    if (l+1 > (n-1))
+                    {
+                        stop = 1;
+                    } else
+                    {
+                        i = 0;
+                        k = 1;
+                        k_max = 1;
+                    }
+                } else
+                {
+                    k = 1;
+                }
+            } else
+            {
+                k = k+1;
+                if (l + k > (n-1))
+                {
+                    c = c+1;
+                    stop = 1;
+                }
+            }
+        }
+
+        double log2_res = Math.log(n) / Math.log(2);
+        b = n/log2_res;
+
+        complexity = c/b;
+
+        DecimalFormat df = new DecimalFormat("#.00");
+        String complexityFormated = df.format(complexity);
+
+        System.out.println(complexityFormated);
+
+        return complexityFormated;
     }
 
     public int getPopularElement(int[] a)
@@ -1884,7 +1992,9 @@ public class PlayState extends State {
             Date now = new Date();
             String strDate = sdfDate.format(now);
 
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+"\n", true);
+            String compl = computeComplexity();
+
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+ " " +compl+ "\n", true);
             FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
             Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));
@@ -2259,8 +2369,8 @@ public class PlayState extends State {
             Date now = new Date();
             String strDate = sdfDate.format(now);
 
-
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+ "\n", true);
+            String compl = computeComplexity();
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+ " " + compl+ "\n", true);
             FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
             Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));
