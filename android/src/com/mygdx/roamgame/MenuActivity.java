@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 public class MenuActivity extends Activity implements OnTaskCompleted {
@@ -30,6 +33,7 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
         //private static MyApi myApiService = null;
         private Context context;
         ProgressDialog progDailog = new ProgressDialog(MenuActivity.this);
+
 
         @Override
         protected void onPreExecute() {
@@ -94,7 +98,10 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
             } else {
                 Toast.makeText(context, "Verified " + String.valueOf(result) + "!", Toast.LENGTH_LONG).show();
                 MenuActivity.userDB.insertProfile( String.valueOf(result), "", "", "", 0);
+                demoMode = true;
                 showButton();
+
+
 
             }
 
@@ -107,13 +114,29 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
     public static int VERSION = 2;
     public static boolean startVerifyTask = false;
     public static int cID = -1;
+    public static boolean demoMode = false;
+    public static boolean doingDemo = false;
+    public static long lastVerifiedTime;
+    public static long currentTime;
+    public static long gameDurationLimit = 60*10;
 
     @Override
     public void onResume() {
         super.onResume();
+        currentTime = Calendar.getInstance().getTimeInMillis()/1000;
 
         System.out.println("resumed");
-        hideButton();
+        if (doingDemo == true) {
+            showButton();
+            doingDemo = false;
+            lastVerifiedTime = Calendar.getInstance().getTimeInMillis()/1000;
+        } else if ((currentTime - lastVerifiedTime) < gameDurationLimit){
+            showButton();
+        }
+        else {
+            hideButton();
+        }
+
         addDatatoLocalDB();
 
         new EndpointsAsyncTask().execute(new Pair<Context, String>(this, "Justin"));
@@ -189,6 +212,15 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
     public void showButton()
     {
         Button enterGame = (Button)findViewById(R.id.startGameButton);
+        Log.d("deubgmenu", "showing button");
+        if (demoMode == true)
+        {
+            Log.d("deubgmenu", "setting start");
+            enterGame.setText("Demo Start");
+        } else
+        {
+            enterGame.setText("Start Real Game!");
+        }
         enterGame.setVisibility(View.VISIBLE);
     }
 
@@ -198,6 +230,8 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         context = this;
+        currentTime = Calendar.getInstance().getTimeInMillis()/1000;
+        lastVerifiedTime = Calendar.getInstance().getTimeInMillis()/1000 - 1200;
 
         userDB = new RoamGameSQLiteHelper(getApplicationContext());
 
@@ -206,6 +240,16 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
             @Override
             public void onClick(View v) {
                 Intent launchGame = new Intent(context, AndroidLauncher.class);
+
+                if (demoMode == true) {
+                    launchGame.putExtra("demoMode", true);
+                    demoMode = false;
+                    doingDemo = true;
+                } else
+                {
+                    launchGame.putExtra("demoMode", false);
+                }
+
                 startActivity(launchGame);
             }
         });
@@ -281,6 +325,7 @@ public class MenuActivity extends Activity implements OnTaskCompleted {
 
     @Override
     public void onTaskCompleted() {
+
         showButton();
     }
 }

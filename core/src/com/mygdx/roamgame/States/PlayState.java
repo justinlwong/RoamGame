@@ -68,13 +68,15 @@ public class PlayState extends State {
 
     public static final int SPRITE_SPACING = 16;
     public static final int GRID_UNIT = 32;
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     // Environments
     private Environment startRoom;
     private Environment subMaze;
 
     // game state info
+    private String movementLog;
+    private boolean isDemo;
     private int score;
     public int healthBarVal;
     private long gameStartTime;
@@ -105,6 +107,7 @@ public class PlayState extends State {
     private int levelScore = 0;
     private long levelStartTime;
     private long levelDuration;
+    private float lastUpdateTime = 0f;
 
     // stats info
     private float realTimeFactor1;
@@ -497,6 +500,8 @@ public class PlayState extends State {
     private long timerCounter;
 
 
+
+
     public class PoisonObject
     {
         public Rectangle rect;
@@ -543,8 +548,10 @@ public class PlayState extends State {
 //    }
 
 
-    public PlayState(final GameStateManager gsm) {
+    public PlayState(final GameStateManager gsm, boolean isD) {
         super(gsm);
+
+        isDemo = isD;
 
         Gdx.input.setCatchBackKey(true);
 
@@ -559,12 +566,21 @@ public class PlayState extends State {
         transitionFrame = false;
         gameStartTime = TimeUtils.millis();
         maxHealthLosable = 200;//0.8f*Gdx.graphics.getWidth();
+        if (isDemo)
+        {
+            maxHealthLosable = 600;
+        }
         maxDistance = 2720f;
         maxDistanceSubMaze = (22+10)*GRID_UNIT;
         prefs = Gdx.app.getPreferences("Stats");
         lastHitTime = 0;
         lastPoisonedTime = 0;
         maxTimerVal = 48;
+        if (isDemo)
+        {
+            maxTimerVal = 100;
+        }
+        lastUpdateTime = 0;
         startRoom = new Environment("roguelike-pack/Map/transition_room.tmx", GRID_UNIT, heatmap_snow_0, 4, 1, 2, 3, 8, 3, 2f);
         subMaze = new Environment("roguelike-pack/Map/submaze_snow_0.tmx", GRID_UNIT, heatmap_snow_0, 10, 1, 1, 10, 21, 2, 1f);
 
@@ -793,7 +809,24 @@ public class PlayState extends State {
 
                 if (selected == 1 )
                 {
-                    Gdx.app.exit();
+                    gameDuration = TimeUtils.millis() - gameStartTime;
+                    //accumulatedFactor1 = 1000*accumulatedFactor1/gameDuration;
+                    //System.out.println(accumulatedFactor1);
+                    prefs.putInteger("score", score);
+                    prefs.putInteger("factor1", (int)currentFactor1);
+                    prefs.putInteger("factor2", (int)currentFactor2);
+                    prefs.flush();
+
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss");//dd/MM/yyyy
+                    Date now = new Date();
+                    String strDate = sdfDate.format(now);
+
+
+                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+"\n", true);
+                    FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
+                    Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
+                    gsm.set(new ScoreScreenState(gsm));
+                    //Gdx.app.exit();
                 }
 
                 //endDialogShowing = false;
@@ -824,23 +857,7 @@ public class PlayState extends State {
 
                 if (selected == 2 )
                 {
-                    gameDuration = TimeUtils.millis() - gameStartTime;
-                    //accumulatedFactor1 = 1000*accumulatedFactor1/gameDuration;
-                    //System.out.println(accumulatedFactor1);
-                    prefs.putInteger("score", score);
-                    prefs.putInteger("factor1", (int)currentFactor1);
-                    prefs.putInteger("factor2", (int)currentFactor2);
-                    prefs.flush();
-
-                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss");//dd/MM/yyyy
-                    Date now = new Date();
-                    String strDate = sdfDate.format(now);
-
-
-                    handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
-                    FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
-                    Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
-                    gsm.set(new ScoreScreenState(gsm));
+                    exitDialog.show(stage);
                 }
 
                 endDialogShowing = false;
@@ -956,7 +973,17 @@ public class PlayState extends State {
         barrelChooseDialog.button("Points", 1L);
         barrelChooseDialog.button("Health", 2L);
 
-        setupTutorialDialogues();
+        if (isDemo == true) {
+            setupTutorialDialogues();
+        } else
+        {
+            tut1Complete = true;
+            tut2Complete = true;
+            tut3Complete = true;
+            tut4Complete = true;
+            tut5Complete = true;
+            tut6Complete = true;
+        }
     }
 
     public void setupTutorialDialogues() {
@@ -1349,21 +1376,27 @@ public class PlayState extends State {
 
             if(dir == 1)
             {
+                //movementLog += "00";
                 player.moveRight();
                 player.keepMoving(Player.dir.right);
             } else if (dir == 2)
             {
+                //movementLog += "01";
                 player.moveLeft();
                 player.keepMoving(Player.dir.left);
             } else if (dir == 3)
             {
+                //movementLog += "10";
                 player.moveDown();
                 player.keepMoving(Player.dir.down);
             } else if (dir == 4)
             {
+                //movementLog += "11";
                 player.moveUp();
                 player.keepMoving(Player.dir.up);
             }
+
+
 
 
             // }
@@ -1780,6 +1813,8 @@ public class PlayState extends State {
 
         totalElapsedTime += dt;
 
+
+
         inputFrequency = (float)inputRegistered / (float)totalElapsedTime;
 
 
@@ -1849,7 +1884,7 @@ public class PlayState extends State {
             Date now = new Date();
             String strDate = sdfDate.format(now);
 
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+"\n", true);
             FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
             Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));
@@ -1892,6 +1927,17 @@ public class PlayState extends State {
                 updateAbilityBoxes(dt);
                 updateHazards(dt);
                 updateRedPoison(dt);
+                //System.out.println(dt);
+                lastUpdateTime += dt;
+
+                if (lastUpdateTime > 1.0f )
+                {
+                    System.out.println("periodic log");
+                    // log info
+                    handle.writeString("event " + String.valueOf(TimeUtils.millis() - gameStartTime) + " " +  String.valueOf(levelCounter) + " 6 " + String.valueOf(maxHealthLosable - healthBarVal) + " " + String.valueOf(score) + " " + String.valueOf(levelScore) + " 0 0 0 " + String.valueOf(levelDuration) + " " + String.valueOf(closestZombieDistance()) + " " + String.valueOf(exitDistance()) + " " + String.valueOf(barrelStreak) + " " + String.valueOf(curTimerVal) + " " + "0 "+String.valueOf(abilityActive)+"\n", true);
+
+                    lastUpdateTime = 0;
+                }
                 //updateSubMazeZombie(dt);
             }
             //updateHealthPack();
@@ -2214,7 +2260,7 @@ public class PlayState extends State {
             String strDate = sdfDate.format(now);
 
 
-            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + "\n", true);
+            handle.writeString("game " + score + " " + gameDuration + " " + String.valueOf((int)(inputFrequency)) + " " + strDate + " " + String.valueOf(isDemo ? 1 : 0)+ "\n", true);
             FileHandle actualLog = Gdx.files.local("gameInfoLog_"+String.valueOf(VERSION)+".txt");
             Gdx.files.local("gameInfoLog_temp.txt").moveTo(actualLog);
             gsm.set(new ScoreScreenState(gsm));

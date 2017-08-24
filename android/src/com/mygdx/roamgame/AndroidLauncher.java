@@ -83,9 +83,10 @@ public class AndroidLauncher extends AndroidApplication {
 
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-
+		Bundle bundle =  getIntent().getExtras();
+		boolean isD = bundle.getBoolean("demoMode");
 		//RoamGame instance = new RoamGame();
-		initialize(new RoamGame(), config);
+		initialize(new RoamGame(isD), config);
 
 		//new loadApiAsyncTask().execute(new Pair<Context, String>(this, "Justin"));
 
@@ -96,9 +97,10 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onResume();
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-
+		Bundle bundle =  getIntent().getExtras();
+		boolean isD = bundle.getBoolean("demoMode");
 		//RoamGame instance = new RoamGame();
-		initialize(new RoamGame(), config);
+		initialize(new RoamGame(isD), config);
 	}
 
 

@@ -31,7 +31,7 @@ import java.util.Random;
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     //private static MyApi myApiService = null;
     private Context context;
-    public static int VERSION = 2;
+    public static int VERSION = 3;
 
     @Override
     protected String doInBackground(Pair<Context, String>... params) {
@@ -97,13 +97,14 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
                             long gameDuration = Long.parseLong(entries[2]) / 1000;
                             int inputFrequency = Integer.parseInt(entries[3]);
                             String timestamp = (entries[4]);
+                            int isDemo = Integer.parseInt(entries[5]);
                             System.out.println("Score: " + String.valueOf(score));
 
                             MenuActivity.userDB.insertScore(timestamp, userName, (int) score);
                             //Toast.makeText(context, "Recorded score " + score + "!", Toast.LENGTH_LONG).show();
                             //GameInfoData gInfo = new GameInfoData(name, score, gameDuration, inputFrequency);
 
-                            MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp).execute();
+                            MenuActivity.myApiService.uploadGameData(gameID, userName, (int) score, (int) gameDuration, inputFrequency, timestamp, isDemo).execute();
                             returnStr = "Added " + userName + "'s entry to datastore!";
                         } else if (entries[0].compareTo("event") == 0) {
 

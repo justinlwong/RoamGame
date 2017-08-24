@@ -22,14 +22,17 @@ public class GameInfoData {
     public int inputFrequency;
     @Index
     public String timestamp;
+    @Index
+    public int isDemo;
 
-    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf, String ts) {
+    public GameInfoData(Long gameID, String u, Long s, Long gd, int inputf, String ts, int isD) {
         id = gameID;
         user = u;
         score = s;
         gameDuration = gd;
         inputFrequency = inputf;
         timestamp = ts;
+        isDemo = isD;
     }
 
 }

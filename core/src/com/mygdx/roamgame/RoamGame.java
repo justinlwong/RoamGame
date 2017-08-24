@@ -41,8 +41,12 @@ public class RoamGame extends ApplicationAdapter  {
 
 	private AppState state = AppState.RUN;
 
+	boolean isDemo = false;
 
-	Texture img;
+	public RoamGame(boolean isD)
+	{
+		this.isDemo = isD;
+	}
 	
 	@Override
 	public void create () {
@@ -51,7 +55,7 @@ public class RoamGame extends ApplicationAdapter  {
 		gsm = new GameStateManager();
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
-		gsm.push(new PlayState(gsm));
+		gsm.push(new PlayState(gsm, isDemo));
 
 		//Gdx.input.setInputProcessor(this);
 		//Gdx.input.setCatchBackKey(true);

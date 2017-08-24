@@ -50,10 +50,10 @@ public class MyEndpoint {
     }
 
     @ApiMethod(name = "uploadGameData")
-    public void uploadGameData(@Named("gameID") int gameID, @Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency, @Named("timestamp") String timestamp) {
+    public void uploadGameData(@Named("gameID") int gameID, @Named("name") String name, @Named("score") int score, @Named("gameDuration") int gameDuration, @Named("inputFrequency") int inputFrequency, @Named("timestamp") String timestamp, @Named("isDemo") int isDemo) {
         //MyBean response = new MyBean();
 
-        GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency, timestamp);
+        GameInfoData gInfo = new GameInfoData((long)gameID, name, (long)score, (long)gameDuration, inputFrequency, timestamp, isDemo);
         // save to datastore
         ofy().save().entity(gInfo).now();
 

@@ -10,6 +10,6 @@ public class DesktopLauncher {
 		config.width = RoamGame.WIDTH;
 		config.height = RoamGame.HEIGHT;
 		config.title = RoamGame.TITLE;
-		new LwjglApplication(new RoamGame(), config);
+		new LwjglApplication(new RoamGame(false), config);
 	}
 }
